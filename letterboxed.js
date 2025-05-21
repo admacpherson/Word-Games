@@ -13,8 +13,18 @@ async function isValidWord(word) {
   return response.ok; // true if found
 }
 
+function FindSide(letter) {
+    // Iterate through each side
+    for(let i = 0; i < square.length; i++) {
+        const letterIndex = square[i].findIndex(l => l === letter);
+        if (letterIndex !== -1) {
+            return letterIndex;
+        }
+    }
+}
 
 
 // Usage:
 isValidWord("apple").then(valid => console.log(valid)); // true
 
+console.log(FindSide('I'));
