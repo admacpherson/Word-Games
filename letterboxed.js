@@ -17,11 +17,12 @@ async function isValidWord(word) {
 function FindSide(letter) {
     // Iterate through each side
     for(let i = 0; i < square.length; i++) {
+        console.log("Current side: ", i, square[i]);
         // Find the index of the letter (-1 if not found)
         const letterIndex = square[i].findIndex(l => l === letter);
         // Return the index after a match
         if (letterIndex !== -1) {
-            return letterIndex;
+            return i;
         }
     }
 }
