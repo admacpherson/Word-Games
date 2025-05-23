@@ -201,6 +201,7 @@ function drawLineBetweenDots(dot1, dot2, className = "dashed-line") {
     drawnLines.push(line);
 }
 
+// Make lines solid after finishing a word
 function makeLinesSolid(wordLength) {
     // Get lines used in most recent word
     const numLines = wordLength.length - 1;
@@ -209,6 +210,18 @@ function makeLinesSolid(wordLength) {
     recentLines.forEach(line => {
         line.classList.remove("dashed-line");
         line.classList.add("solid-line");
+    })
+}
+
+// Make lines solid after backspacing into a word
+function makeLinesDashed(wordLength) {
+    // Get lines used in most recent word
+    const numLines = wordLength.length - 1;
+    const recentLines = drawnLines.slice(-numLines);
+    // Turn solid
+    recentLines.forEach(line => {
+        line.classList.remove("solid-line");
+        line.classList.add("dashed-line");
     })
 }
 
@@ -253,7 +266,7 @@ document.addEventListener('keydown', async (event) => {
             currentWord = lastWord.split('');
             const removedLetter = currentWord.pop();
             grayLetters(removedLetter, false);
-            console.log(currentWord);
+            makeLinesDashed(currentWord.length);
         }
         // Remove line
         if (drawnLines.length > 0) {
