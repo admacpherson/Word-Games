@@ -37,11 +37,14 @@ positions.forEach(createLetterDiv);
 
 // Create a <div> element for each letter
 function createLetterDiv(pos, index) {
+    // Create element for each letter
     const div = document.createElement('div');
     div.className = "letter";
+    
     // Set position
     div.style.gridRow = pos[0];
     div.style.gridColumn = pos[1];
+    
     // Display letter
     const letter = letterMap[index]
     div.innerText = letter;
@@ -65,9 +68,9 @@ function createLetterDiv(pos, index) {
 function updateCurrentWord() {
     // Update current word display
     document.getElementById('word-banner').innerText = currentWord.join('');
+    
     // Updated stored word display
     document.getElementById('stored-words').innerText = wordsStored.join(' - ');
-    
 }
 
 // Gets previous letter in the word
@@ -87,8 +90,10 @@ function getPreviousLetter() {
 
 // Determine if a word is valid
 async function isValidWord(word) {
-    console.log(word);
+    // Use dictionary API
     const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+    
+    // If word is valid return true
     if (response.ok) {
         return true;
     } else return false;
@@ -111,14 +116,17 @@ function findSide(letter) {
 function getValidNextLetters(currentLetter) {
     // Create shallow copy of square
     let valid_letters = square.slice();
+    
     // If no letters have been entered yet
     if (currentLetter === '') {
         valid_letters = valid_letters.flat();
     } else {
         // Find current side
         let currentSide = findSide(currentLetter);
+        
         // Remove letters from current side
         valid_letters.splice(currentSide, 1);
+        
         // Flatten into 1D array
         valid_letters = valid_letters.flat();
     }
@@ -129,6 +137,7 @@ function getValidNextLetters(currentLetter) {
 // Check if the next letter in a word is valid
 function nextLetterIsValid(currentLetter, nextLetter) {
     const validNextLetters = getValidNextLetters(currentLetter);
+    
     if (validNextLetters.findIndex(l => l === nextLetter) !== -1) {
         return true;
     } else return false;
@@ -146,6 +155,7 @@ function grayLetters(letter, addgray) {
             } else {
                 // Check how many times the letter is used in the current word
                 const countInCurrent = currentWord.filter(l => l === letter).length;
+                
                 //Check how many times the letter is used in stored words using .reduce (initial value is 0)
                 const countInStored = wordsStored.reduce((count, word) => {
                     return count + [...word].filter(l => l === letter).length
@@ -204,6 +214,7 @@ function makeLinesSolid(wordLength) {
     // Get lines used in most recent word
     const numLines = wordLength - 1;
     const recentLines = drawnLines.slice(-numLines);
+    
     // Turn solid
     recentLines.forEach(line => {
         line.classList.remove("dashed-line");
@@ -216,19 +227,25 @@ function makeLinesDashed(wordLength) {
     // Get lines used in most recent word
     const numLines = wordLength - 1;
     const recentLines = drawnLines.slice(-numLines);
-    // Turn solid
+    
+    // Turn dashed
     recentLines.forEach(line => {
         line.classList.remove("solid-line");
         line.classList.add("dashed-line");
     })
 }
 
+// Color in dots when a new letter is added
 function colorDots(prevDot, currDot) {
+    // Set previous dot to be used but not active
     prevDot.classList.remove("current-dot");
     prevDot.classList.add("used-dot");
+    
+    // Set new dot to be active
     currDot.classList.add("current-dot");
 }
 
+// Update dot colors on backspace
 function colorDotsOnBackspace(removedLetter, previousLetter) {
     // Get divs for previous and removed letters
     const removedDiv = letterDivs.find(div => div.innerText === removedLetter);
@@ -238,13 +255,17 @@ function colorDotsOnBackspace(removedLetter, previousLetter) {
     if (removedDiv) {
         // Get removed dot div element
         const removedDot = removedDiv.querySelector('.dot');
+        
         // Remove current dot styling
         removedDot.classList.remove('current-dot');
-        // Check if letter is used previously
+        
+        // Check if letter is used previously in current word
         const countInCurrent = currentWord.filter(l => l === removedLetter).length;
+        // Check if letter is used previously in previous words
         const countInStored = wordsStored.reduce((count, word) => {
             return count + [...word].filter(l => l === removedLetter).length;
         }, 0);
+        
         // If not used othwerwise, remove used styling
         if (countInCurrent + countInStored === 0) {
             removedDot.classList.remove("used-dot")
@@ -257,10 +278,11 @@ function colorDotsOnBackspace(removedLetter, previousLetter) {
     }
 }
 
-// Add listener for user input
+// Listener for user input
 document.addEventListener('keydown', async (event) => {
     // Standardize letters
     const letter = event.key.toUpperCase();
+    
     // Get previous letter
     let previousLetter = getPreviousLetter();
     
@@ -271,85 +293,107 @@ document.addEventListener('keydown', async (event) => {
     // Check if input is a letter using Regex 
     if (/^[A-Z]$/.test(letter)) {
         if (nextLetterIsValid(previousLetter, letter)) {
+            // Make letters used
             grayLetters(letter, true);       
             
-            //Draw line
+            // Draw line and update dots
             if (prevDiv && currentDiv) {
                 //Get dot child for each letter div
                 const prevDot = prevDiv.querySelector('.dot');
                 const currDot = currentDiv.querySelector('.dot');
+                
+                // If children exist, draw lines and update coloring
                 if(prevDot && currDot) {
                     drawLineBetweenDots(prevDot, currDot);
                     colorDots(prevDot, currDot);
                 }
             }
             
+            // Add the new letter to the current word
             currentWord.push(letter);
         } 
+        
     // Input is backspace
     } else if (event.key === 'Backspace') {
         // Don't allow user to remove first letter of adjacent word
         if (wordsStored.length === 0 || currentWord.length > 1) {
             // Get removed letter
             const removedLetter = currentWord.pop();
+            
+            // Update coloring for removed letter
             grayLetters(removedLetter, false);
-            // Update previous letter after removal
+            
+            // Get new previous letter after removal
             let previousLetter = getPreviousLetter();
+            
             // Update active/used dots
             colorDotsOnBackspace(removedLetter, previousLetter);
+            
             // Remove line
             if (drawnLines.length > 0) {
                 const lastLine = drawnLines.pop();
                 lastLine.remove();
             }
+            
         // Backspace into last word
         } else if (wordsStored.length > 0 && currentWord.length === 1) {
             // Get removed letter
             const removedLetter = currentWord.pop();
+            
             // Turn lastWord into currentWord
             const lastWord = wordsStored.pop();
             currentWord = lastWord.split('');
+            
             // Change lines from solid to dashed
             makeLinesDashed(currentWord.length);
-            // Remove gray from backspaced letter (if not otherwise used)
+            
+            // Remove color from backspaced letter (if not otherwise used)
             grayLetters(removedLetter, false);
+            
             // Update previous letter after removal
             let previousLetter = getPreviousLetter();
+            
             // Update active/used dots
             colorDotsOnBackspace(removedLetter, previousLetter);
         }
-        
         
     // Input is enter
     } else if (event.key === 'Enter') {
         // Min word length of 3
         if (currentWord.length > 0 && currentWord.length < 3) {
             console.log("Too short");
+            
         // If at least 3 letters are entered
         } else if (currentWord.length >= 3) {
             //Convert array into a string
             const finishedWord = currentWord.join('');
+            
             // Validate word
             const isValid = await isValidWord(finishedWord);
+            
+            // If word is valid
             if (isValid) {
                 // Store finished word
                 wordsStored.push(finishedWord);
-                console.log("Word stored: ", finishedWord);
+                
                 // Start next word with last letter
                 currentWord = [finishedWord.slice(-1)]
+                
                 // Update display after async
                 updateCurrentWord();
-                // Gray out letters 
+                
+                // Update letter coloring
                 grayLetters(finishedWord);
+                
                 // Turn lines solid
                 makeLinesSolid(finishedWord.length);
                 
             } else {
                 console.log("Invalid word");
             }
-            
         }
     }
+    
     // Update displayed word(s) at the top
     updateCurrentWord();
 })
