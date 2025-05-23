@@ -45,13 +45,31 @@ function updateCurrentWord() {
     document.getElementById('word-banner').innerText = "Current Word: " + currentWord.join('');
 }
 
+function getPreviousLetter() {
+    let previousLetter = '';
+    // Get current letter to determine if next letter is valid
+    if (currentWord.length > 0) {
+        // Get last letter
+        previousLetter = currentWord[currentWord.length-1];
+    } else if (wordsStored.length > 0) {
+        lastWord = wordsStored.length - 1;
+        previousLetter = wordsStored[lastWord][lastWord.length-1];
+    }
+    return previousLetter;
+}
+
 // Add listener for user input
 document.addEventListener('keydown', (event) => {
+    let previousLetter = getPreviousLetter();
+    console.log("Previous letter: ", previousLetter);
     // Standardize letters
     const letter = event.key.toUpperCase();
     // Check if input is a letter using Regex 
-    if(/^[A-Z]$/.test(letter)) {
-        currentWord.push(letter);
+    if (/^[A-Z]$/.test(letter)) {
+        if (NextLetterIsValid(previousLetter, letter)) {
+            currentWord.push(letter);
+        } 
+        
     // Input is backspace
     } else if (event.key === 'Backspace') {
         currentWord.pop();
@@ -80,15 +98,20 @@ function FindSide(letter) {
 }
 
 // Given the current letter, determine what is allowed to come next
-function ValidNextLetters(letter) {
-    // Find current side
-    currentSide = FindSide(letter);
+function ValidNextLetters(currentLetter) {
     // Create shallow copy of square
-    valid_letters = square.slice();
-    // Remove letters from current side
-    valid_letters.splice(currentSide, 1);
-    // Flatten into 1D array
-    valid_letters = valid_letters.flat();
+    let valid_letters = square.slice();
+    // If no letters have been entered yet
+    if (currentLetter === '') {
+        valid_letters = valid_letters.flat();
+    } else {
+        // Find current side
+        let currentSide = FindSide(currentLetter);
+        // Remove letters from current side
+        valid_letters.splice(currentSide, 1);
+        // Flatten into 1D array
+        valid_letters = valid_letters.flat();
+    }
     // Return
     return valid_letters;
 }
@@ -106,14 +129,14 @@ function NextLetterIsValid(currentLetter, nextLetter) {
 positions.forEach(createLetterDiv);
 
 // Word lookup
-isValidWord("apple").then(valid => console.log("Valid word:", valid));
+//isValidWord("apple").then(valid => console.log("Valid word:", valid));
 
 // Find side
-console.log("Side: ", FindSide('I'));
+//console.log("Side: ", FindSide('I'));
 
 // Get valid next letters
-console.log("Valid Next Letters: ", ValidNextLetters('I'));
+//console.log("Valid Next Letters: ", ValidNextLetters('I'));
 
 // Determine if next letter is valid
-console.log("Next letter is valid: ", NextLetterIsValid('I', 'W'));
-console.log("Next letter is valid: ", NextLetterIsValid('I', 'J'));
+//console.log("Next letter is valid: ", NextLetterIsValid('I', 'W'));
+//console.log("Next letter is valid: ", NextLetterIsValid('I', 'J'));
