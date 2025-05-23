@@ -6,9 +6,10 @@ let leftSide = ['S', 'L', 'R'];
 const square = [topSide, rightSide, bottomSide, leftSide];
 const square_order = ["Top", "Right", "Bottom", "Left"];
 
-// Define player words
+// Define player words and lines
 let currentWord = [];
 let wordsStored = [];
+let drawnLines = [];
 
 // Game board in HTML
 const board = document.getElementById("game-board");
@@ -209,6 +210,11 @@ document.addEventListener('keydown', async (event) => {
             grayLetters(removedLetter, false);
             console.log(currentWord);
         }
+        // Remove line
+        if (drawnLines.length > 0) {
+            const lastLine = drawnLines.pop();
+            lastLine.remove();
+        }
         
     // Input is enter
     } else if (event.key === 'Enter') {
@@ -274,4 +280,6 @@ function drawLineBetweenDots(dot1, dot2) {
     
     // Add to SVG layer
     document.getElementById("line-layer").appendChild(line);
+    
+    drawnLines.push(line);
 }
