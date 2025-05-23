@@ -69,20 +69,43 @@ document.addEventListener('keydown', (event) => {
     // Standardize letters
     const letter = event.key.toUpperCase();
     
-    console.log("Previous letter: ", previousLetter);
-    console.log(ValidNextLetters(previousLetter));
-    console.log("Entered letter: ", letter);
+    //console.log("Previous letter: ", previousLetter);
+    //console.log(ValidNextLetters(previousLetter));
+    //console.log("Entered letter: ", letter);
     
     
     // Check if input is a letter using Regex 
     if (/^[A-Z]$/.test(letter)) {
         if (NextLetterIsValid(previousLetter, letter)) {
             currentWord.push(letter);
-            console.log("Next allowed: ", ValidNextLetters(letter));
         } 
     // Input is backspace
     } else if (event.key === 'Backspace') {
-        currentWord.pop();
+        // Don't allow user to remove first letter of adjacent word
+        if (wordsStored.length === 0 || currentWord.length > 1) {
+            currentWord.pop();
+        }
+        
+    // Input is enter
+    } else if (event.key === 'Enter') {
+        // Min word length of 3
+        if (currentWord.length > 0 && currentWord.length < 3) {
+            console.log("Too short");
+        // If at least 3 letters are entered
+        } else if (currentWord.length >= 3) {
+            //Convert array into a string
+            const finishedWord = currentWord.join('');
+            // Validate word
+            if (isValidWord(finishedWord)) {
+                wordsStored.push(finishedWord);
+                console.log("Word stored: ", finishedWord);
+                currentWord = []
+                currentWord.push(finishedWord.slice(-1));
+            } else {
+                console.log("Invalid word")
+            }
+            
+        }
     }
     // Update displayed word at the top
     updateCurrentWord();
@@ -90,8 +113,9 @@ document.addEventListener('keydown', (event) => {
 
 // Determine if a word is valid
 async function isValidWord(word) {
-  const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-  return response.ok; // true if found
+    console.log(word);
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+      return response.ok; // true if found
 }
 
 // Find which side (0-3) a letter is on
