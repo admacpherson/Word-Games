@@ -1,10 +1,14 @@
 // Define game board
-var topSide = ['W', 'M', 'Y'];
-var leftSide = ['S', 'L', 'R'];
-var bottomSide = ['H', 'N', 'D'];
-var rightSide = ['T', 'O', 'I'];
+let topSide = ['W', 'M', 'Y'];
+let leftSide = ['S', 'L', 'R'];
+let bottomSide = ['H', 'N', 'D'];
+let rightSide = ['T', 'O', 'I'];
 const square = [topSide, leftSide, bottomSide, rightSide];
 const square_order = ["Top", "Left", "Bottom", "Right"];
+
+// Define player words
+let currentWord = [];
+let wordsStored = [];
 
 
 // Determine if a word is valid
@@ -42,6 +46,10 @@ function ValidNextLetters(letter) {
 
 // Check if the next letter in a word is valid
 function NextLetterIsValid(currentLetter, nextLetter) {
+    let validNextLetters = ValidNextLetters(currentLetter);
+    if (validNextLetters.findIndex(l => l === nextLetter) !== -1) {
+        return true;
+    } else return false;
 }
 
 
@@ -51,5 +59,9 @@ isValidWord("apple").then(valid => console.log("Valid word:", valid));
 // Find side
 console.log("Side: ", FindSide('I'));
 
-// Valid next letters
+// Get valid next letters
 console.log("Valid Next Letters: ", ValidNextLetters('I'));
+
+// Determine if next letter is valid
+console.log("Next letter is valid: ", NextLetterIsValid('I', 'W'));
+console.log("Next letter is valid: ", NextLetterIsValid('I', 'J'));
