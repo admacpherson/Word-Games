@@ -204,7 +204,7 @@ function drawLineBetweenDots(dot1, dot2, className = "dashed-line") {
 // Make lines solid after finishing a word
 function makeLinesSolid(wordLength) {
     // Get lines used in most recent word
-    const numLines = wordLength.length - 1;
+    const numLines = wordLength - 1;
     const recentLines = drawnLines.slice(-numLines);
     // Turn solid
     recentLines.forEach(line => {
@@ -216,7 +216,7 @@ function makeLinesSolid(wordLength) {
 // Make lines solid after backspacing into a word
 function makeLinesDashed(wordLength) {
     // Get lines used in most recent word
-    const numLines = wordLength.length - 1;
+    const numLines = wordLength - 1;
     const recentLines = drawnLines.slice(-numLines);
     // Turn solid
     recentLines.forEach(line => {
@@ -262,11 +262,11 @@ document.addEventListener('keydown', async (event) => {
         // Backspace into last word
         } else if (wordsStored.length > 0 && currentWord.length === 1) {
             const lastWord = wordsStored.pop();
-            console.log(lastWord);
             currentWord = lastWord.split('');
+            makeLinesDashed(currentWord.length);
             const removedLetter = currentWord.pop();
             grayLetters(removedLetter, false);
-            makeLinesDashed(currentWord.length);
+            
         }
         // Remove line
         if (drawnLines.length > 0) {
