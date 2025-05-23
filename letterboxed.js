@@ -22,14 +22,14 @@ const letterDivs = [];
 
 // 5 x 5 grid with empty corners
 const positions = [
-  // Top row (W M Y)
+  // Top row 
   [1, 2], [1, 3], [1, 4],
-  // Right column (T O I)
+  // Right column
   [2, 5], [3, 5], [4, 5],
-  // Bottom row (D N H — reversed)
-  [5, 4], [5, 3], [5, 2],
-  // Left column (R L S — reversed)
-  [4, 1], [3, 1], [2, 1],
+  // Bottom row
+  [5, 2], [5, 3], [5, 4],
+  // Left column
+  [2, 1], [3, 1], [4, 1],
 ];
 
 // Create divs for each letter
@@ -73,6 +73,19 @@ function updateCurrentWord() {
     document.getElementById('stored-words').innerText = wordsStored.join(' - ');
 }
 
+function showBanner() {
+    // Show banner
+    const banner = document.getElementById('popup-banner');
+    banner.classList.remove('hidden');
+    banner.classList.add('visible');
+    
+    // Hide after 2 seconds
+    setTimeout(() => {
+        banner.classList.remove('visible');
+        banner.classList.add('hidden');
+    }, 2000)
+}
+
 // Gets previous letter in the word
 function getPreviousLetter() {
     let previousLetter = '';
@@ -86,7 +99,6 @@ function getPreviousLetter() {
     }
     return previousLetter;
 }
-
 
 // Determine if a word is valid
 async function isValidWord(word) {
@@ -389,7 +401,7 @@ document.addEventListener('keydown', async (event) => {
                 makeLinesSolid(finishedWord.length);
                 
             } else {
-                console.log("Invalid word");
+                showBanner();
             }
         }
     }
