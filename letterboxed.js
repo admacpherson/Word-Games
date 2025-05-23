@@ -73,9 +73,10 @@ function updateCurrentWord() {
     document.getElementById('stored-words').innerText = wordsStored.join(' - ');
 }
 
-function showBanner() {
+function showBanner(bannerText) {
     // Show banner
     const banner = document.getElementById('popup-banner');
+    banner.innerText = bannerText;
     banner.classList.remove('hidden');
     banner.classList.add('visible');
     
@@ -373,7 +374,7 @@ document.addEventListener('keydown', async (event) => {
     } else if (event.key === 'Enter') {
         // Min word length of 3
         if (currentWord.length > 0 && currentWord.length < 3) {
-            console.log("Too short");
+            showBanner("Too short");
             
         // If at least 3 letters are entered
         } else if (currentWord.length >= 3) {
@@ -401,7 +402,7 @@ document.addEventListener('keydown', async (event) => {
                 makeLinesSolid(finishedWord.length);
                 
             } else {
-                showBanner();
+                showBanner("Invalid word");
             }
         }
     }
