@@ -74,11 +74,6 @@ document.addEventListener('keydown', async (event) => {
     // Standardize letters
     const letter = event.key.toUpperCase();
     
-    //console.log("Previous letter: ", previousLetter);
-    //console.log(ValidNextLetters(previousLetter));
-    //console.log("Entered letter: ", letter);
-    
-    
     // Check if input is a letter using Regex 
     if (/^[A-Z]$/.test(letter)) {
         if (NextLetterIsValid(previousLetter, letter)) {
@@ -110,9 +105,11 @@ document.addEventListener('keydown', async (event) => {
                 console.log("Word stored: ", finishedWord);
                 // Start next word with last letter
                 currentWord = [finishedWord.slice(-1)]
+                updateCurrentWord();
                 greyOutLetters(finishedWord);
+                
             } else {
-                console.log("Invalid word")
+                console.log("Invalid word");
             }
             
         }
