@@ -167,6 +167,51 @@ function grayLetters(letter, addgray) {
     });
 }
 
+
+// Draw lines between dots of selected letters
+function drawLineBetweenDots(dot1, dot2, className = "dashed-line") {
+    //Get positions of dots relative to viewport
+    const rect1 = dot1.getBoundingClientRect();
+    const rect2 = dot2.getBoundingClientRect();
+    
+    // Get board position to offset coordinates
+    const boardRect = document.getElementById('game-board').getBoundingClientRect();
+    
+    // Compute center coordinates of dots relative to board
+    const x1 = (rect1.left + rect1.width / 2) - boardRect.left;
+    const y1 = (rect1.top + rect1.height / 2) - boardRect.top;
+    const x2 = (rect2.left + rect2.width / 2) - boardRect.left;
+    const y2 = (rect2.top + rect2.height / 2) - boardRect.top;
+    
+    // Create the <line> element in SVG using W3 namespace
+    const line  = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    
+    // Set line coordinates
+    line.setAttribute("x1", x1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y1", y1);
+    line.setAttribute("y2", y2);
+    
+    // Set line class so it is styled
+    line.classList.add(className);
+    
+    // Add to SVG layer
+    document.getElementById("line-layer").appendChild(line);
+    
+    drawnLines.push(line);
+}
+
+function makeLinesSolid(wordLength) {
+    // Get lines used in most recent word
+    const numLines = wordLength.length - 1;
+    const recentLines = drawnLines.slice(-numLines);
+    // Turn solid
+    recentLines.forEach(line => {
+        line.classList.remove("dashed-line");
+        line.classList.add("solid-line");
+    })
+}
+
 // Add listener for user input
 document.addEventListener('keydown', async (event) => {
     // Standardize letters
@@ -235,8 +280,10 @@ document.addEventListener('keydown', async (event) => {
                 currentWord = [finishedWord.slice(-1)]
                 // Update display after async
                 updateCurrentWord();
-                // gray 
-                grayOutLetters(finishedWord);
+                // Gray out letters 
+                grayLetters(finishedWord);
+                // Turn lines solid
+                makeLinesSolid(finishedWord.length);
                 
             } else {
                 console.log("Invalid word");
@@ -247,39 +294,3 @@ document.addEventListener('keydown', async (event) => {
     // Update displayed word(s) at the top
     updateCurrentWord();
 })
-
-
-// Draw lines between dots of selected letters
-function drawLineBetweenDots(dot1, dot2) {
-    //Get positions of dots relative to viewport
-    const rect1 = dot1.getBoundingClientRect();
-    const rect2 = dot2.getBoundingClientRect();
-    
-    // Get board position to offset coordinates
-    const boardRect = document.getElementById('game-board').getBoundingClientRect();
-    
-    // Compute center coordinates of dots relative to board
-    const x1 = (rect1.left + rect1.width / 2) - boardRect.left;
-    const y1 = (rect1.top + rect1.height / 2) - boardRect.top;
-    const x2 = (rect2.left + rect2.width / 2) - boardRect.left;
-    const y2 = (rect2.top + rect2.height / 2) - boardRect.top;
-    
-    // Create the <line> element in SVG using W3 namespace
-    const line  = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    
-    // Set line coordinates
-    line.setAttribute("x1", x1);
-    line.setAttribute("x2", x2);
-    line.setAttribute("y1", y1);
-    line.setAttribute("y2", y2);
-    
-    // Set line stroke
-    line.setAttribute("stroke", "black");
-    line.setAttribute("stroke-width", "2");
-
-    
-    // Add to SVG layer
-    document.getElementById("line-layer").appendChild(line);
-    
-    drawnLines.push(line);
-}
