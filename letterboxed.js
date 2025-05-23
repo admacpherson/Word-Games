@@ -1,10 +1,10 @@
 // Define game board
 let topSide = ['W', 'M', 'Y'];
-let leftSide = ['S', 'L', 'R'];
-let bottomSide = ['H', 'N', 'D'];
 let rightSide = ['T', 'O', 'I'];
-const square = [topSide, leftSide, bottomSide, rightSide];
-const square_order = ["Top", "Left", "Bottom", "Right"];
+let bottomSide = ['H', 'N', 'D'];
+let leftSide = ['S', 'L', 'R'];
+const square = [topSide, rightSide, bottomSide, leftSide];
+const square_order = ["Top", "Right", "Bottom", "Left"];
 
 // Define player words
 let currentWord = [];
@@ -42,7 +42,19 @@ function createLetterDiv(pos, index) {
     div.style.gridRow = pos[0];
     div.style.gridColumn = pos[1];
     // Display letter
-    div.innerText = letterMap[index];
+    const letter = letterMap[index]
+    div.innerText = letter;
+    
+    // Use data attribute to set metadata attribute
+    const sideIndex = FindSide(letter);
+    const sideName = square_order[sideIndex];
+    div.setAttribute('data-side', sideName);
+    
+    // Create a dot on the inner border
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    div.appendChild(dot);
+    
     // Add to board
     board.appendChild(div);
     letterDivs.push(div);

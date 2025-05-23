@@ -4,6 +4,11 @@ body {
     margin-top: 5vh;
 }
 
+#word-banner {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
 #game-board {
     display: grid;
     grid-template-columns: repeat(5, 10vh);
@@ -26,14 +31,43 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 24px; 
-    border
+    position: relative;
 }
 
 .letter.used {
     color: gray;
 }
 
-#word-banner {
-    font-size: 24px;
-    margin-bottom: 20px;
+/* Create a dot on each letter div*/
+.dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: black;
+    border-radius: 50%;
+}
+
+/* Position dots inward based on side (use data attribute selector)*/
+[data-side="Top"] .dot {
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+[data-side="Right"] .dot {
+    left: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+[data-side="Bottom"] .dot {
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+[data-side="Left"] .dot {
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
 }
