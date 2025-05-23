@@ -29,6 +29,10 @@ body {
     border
 }
 
+.letter.used {
+    color: gray;
+}
+
 #word-banner {
     font-size: 24px;
     margin-bottom: 20px;

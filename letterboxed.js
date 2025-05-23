@@ -82,13 +82,15 @@ document.addEventListener('keydown', async (event) => {
     // Check if input is a letter using Regex 
     if (/^[A-Z]$/.test(letter)) {
         if (NextLetterIsValid(previousLetter, letter)) {
+            greyLetters(letter, true);
             currentWord.push(letter);
         } 
     // Input is backspace
     } else if (event.key === 'Backspace') {
         // Don't allow user to remove first letter of adjacent word
         if (wordsStored.length === 0 || currentWord.length > 1) {
-            currentWord.pop();
+            const removedLetter = currentWord.pop();
+            greyLetters(removedLetter, false);
         }
         
     // Input is enter
@@ -100,23 +102,55 @@ document.addEventListener('keydown', async (event) => {
         } else if (currentWord.length >= 3) {
             //Convert array into a string
             const finishedWord = currentWord.join('');
-            // Check if word is valid before storing
+            // Validate word
             const isValid = await isValidWord(finishedWord);
             if (isValid) {
-                console.log(isValid);
+                // Store finished word
                 wordsStored.push(finishedWord);
                 console.log("Word stored: ", finishedWord);
                 // Start next word with last letter
                 currentWord = [finishedWord.slice(-1)]
+                greyOutLetters(finishedWord);
             } else {
                 console.log("Invalid word")
             }
             
         }
     }
-    // Update displayed word at the top
+    // Update displayed word(s) at the top
     updateCurrentWord();
 })
+
+function greyLetters(letter, addGrey) {
+    letterDivs.forEach((div) => {
+        // If the letter matches the current <div>
+        if (div.innerText === letter) {
+            // Mark the letter as used
+            if (addGrey) {
+                div.classList.add('used');
+            // Remove the grey if the letter hasn't been used previously
+            } else {
+                // Check how many times the letter is used in the current word
+                const countInCurrent = currentWord.filter(l => l === letter).length;
+                //Check how many times the letter is used in stored words using .reduce (initial value is 0)
+                const countInStored = wordsStored.reduce((count, word) => {
+                    return count + [...word].filter(l => l === letter).length
+                }, 0)
+                
+                const totalCount = countInCurrent + countInStored;
+                
+                if (totalCount === 0) {
+                    letterDivs.forEach((div) => {
+                        if (div.innerText === letter) {
+                            div.classList.remove('used');
+                        }
+                    });
+                }
+                
+            }
+        }
+    })
+}
 
 // Determine if a word is valid
 async function isValidWord(word) {
