@@ -1,3 +1,9 @@
+
+console.log("letterboxed.js loaded");
+console.log("document.readyState:", document.readyState);
+console.log("document.getElementById('game-board'):", document.getElementById('game-board'));
+
+
 // Define game board
 let topSide = ['W', 'M', 'Y'];
 let leftSide = ['S', 'L', 'R'];
@@ -11,7 +17,14 @@ let currentWord = [];
 let wordsStored = [];
 
 // Game board in HTML
-const board = document.getElementById('game-board');
+const board = document.getElementById("game-board");
+
+console.log("Game board: ", document.getElementById("game-board")); // will show null if it's missing
+
+
+const letterMap = square.flat();
+
+const letterDivs = [];
 
 // 3 x 3 grid
 const positions = [
@@ -20,6 +33,20 @@ const positions = [
     [2, 0], [2, 1], [2, 2]
 ];
 
+// Create a div for each letter
+function createLetterDiv(pos, index) {
+    const div = document.createElement('div');
+    div.className = "letter";
+    // Set position
+    div.style.gridRow = pos[0] + 1;
+    div.style.gridColumn = pos[1] + 1;
+    div.innerText = letterMap[index];
+    // Add to board
+    board.appendChild(div);
+    letterDivs.push(div);
+}
+
+positions.forEach(createLetterDiv);
 
 // Determine if a word is valid
 async function isValidWord(word) {
