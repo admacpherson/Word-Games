@@ -77,15 +77,24 @@ document.addEventListener('keydown', async (event) => {
     // Check if input is a letter using Regex 
     if (/^[A-Z]$/.test(letter)) {
         if (NextLetterIsValid(previousLetter, letter)) {
-            greyLetters(letter, true);
+            grayLetters(letter, true);
             currentWord.push(letter);
         } 
     // Input is backspace
     } else if (event.key === 'Backspace') {
         // Don't allow user to remove first letter of adjacent word
         if (wordsStored.length === 0 || currentWord.length > 1) {
+            console.log(currentWord);
             const removedLetter = currentWord.pop();
-            greyLetters(removedLetter, false);
+            grayLetters(removedLetter, false);
+        // Backspace into last word
+        } else if (wordsStored.length > 0 && currentWord.length === 1) {
+            const lastWord = wordsStored.pop();
+            console.log(lastWord);
+            currentWord = lastWord.split('');
+            const removedLetter = currentWord.pop();
+            grayLetters(removedLetter, false);
+            console.log(currentWord);
         }
         
     // Input is enter
@@ -105,8 +114,10 @@ document.addEventListener('keydown', async (event) => {
                 console.log("Word stored: ", finishedWord);
                 // Start next word with last letter
                 currentWord = [finishedWord.slice(-1)]
+                // Update display after async
                 updateCurrentWord();
-                greyOutLetters(finishedWord);
+                // gray 
+                grayOutLetters(finishedWord);
                 
             } else {
                 console.log("Invalid word");
@@ -118,14 +129,14 @@ document.addEventListener('keydown', async (event) => {
     updateCurrentWord();
 })
 
-function greyLetters(letter, addGrey) {
+function grayLetters(letter, addgray) {
     letterDivs.forEach((div) => {
         // If the letter matches the current <div>
         if (div.innerText === letter) {
             // Mark the letter as used
-            if (addGrey) {
+            if (addgray) {
                 div.classList.add('used');
-            // Remove the grey if the letter hasn't been used previously
+            // Remove the gray if the letter hasn't been used previously
             } else {
                 // Check how many times the letter is used in the current word
                 const countInCurrent = currentWord.filter(l => l === letter).length;
