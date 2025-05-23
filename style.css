@@ -52,33 +52,35 @@ body {
 /* Create a dot on each letter div*/
 .dot {
     position: absolute;
-    width: 8px;
-    height: 8px;
-    background-color: black;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+    border: 3px solid black;
     border-radius: 50%;
+    box-sizing: border-box;
 }
 
 /* Position dots inward based on side (use data attribute selector)*/
 [data-side="Top"] .dot {
-    bottom: -4px;
+    bottom: -8px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 [data-side="Right"] .dot {
-    left: -4px;
+    left: -8px;
     top: 50%;
     transform: translateY(-50%);
 }
 
 [data-side="Bottom"] .dot {
-    top: -4px;
+    top: -8px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 [data-side="Left"] .dot {
-    right: -4px;
+    right: -8px;
     top: 50%;
     transform: translateY(-50%);
 }
@@ -93,12 +95,12 @@ body {
 }
 
 .dashed-line {
-    stroke: black;
-    stroke-width: 2;
-    stroke-dasharray: 4;
+    stroke: blue;
+    stroke-width: 4;
+    stroke-dasharray: 12;
 }
 
 .solid-line {
-    stroke: black;
-    stroke-width: 2;
+    stroke: blue;
+    stroke-width: 4;
 }
