@@ -19,11 +19,16 @@ const letterMap = square.flat();
 //Placeholder array for letter <div> elements
 const letterDivs = [];
 
-// 3 x 3 grid
+// 5 x 5 grid with empty corners
 const positions = [
-    [0, 0], [0, 1], [0, 2],
-    [1, 0],         [1, 2],
-    [2, 0], [2, 1], [2, 2]
+  // Top row (W M Y)
+  [1, 2], [1, 3], [1, 4],
+  // Right column (T O I)
+  [2, 5], [3, 5], [4, 5],
+  // Bottom row (D N H — reversed)
+  [5, 4], [5, 3], [5, 2],
+  // Left column (R L S — reversed)
+  [4, 1], [3, 1], [2, 1],
 ];
 
 // Create a <div> element for each letter
@@ -60,16 +65,21 @@ function getPreviousLetter() {
 
 // Add listener for user input
 document.addEventListener('keydown', (event) => {
-    let previousLetter = getPreviousLetter();
-    console.log("Previous letter: ", previousLetter);
+    const previousLetter = getPreviousLetter();
     // Standardize letters
     const letter = event.key.toUpperCase();
+    
+    console.log("Previous letter: ", previousLetter);
+    console.log(ValidNextLetters(previousLetter));
+    console.log("Entered letter: ", letter);
+    
+    
     // Check if input is a letter using Regex 
     if (/^[A-Z]$/.test(letter)) {
         if (NextLetterIsValid(previousLetter, letter)) {
             currentWord.push(letter);
+            console.log("Next allowed: ", ValidNextLetters(letter));
         } 
-        
     // Input is backspace
     } else if (event.key === 'Backspace') {
         currentWord.pop();

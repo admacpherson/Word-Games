@@ -6,12 +6,12 @@ body {
 
 #game-board {
     display: grid;
-    grid-template-columns: 100px 100px 100px;
-    grid-template-rows: 100px 100px 100px;
+    grid-template-columns: repeat(5, 50);
+    grid-template-rows: repeat(5, 50);
     margin: auto;
     position: relative;
-    width: 300px;
-    height: 100px;
+    width: 200px;
+    height: 200px;
 }
 
 .letter {
