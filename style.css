@@ -6,24 +6,30 @@ body {
 
 #game-board {
     display: grid;
-    grid-template-columns: repeat(5, 50);
-    grid-template-rows: repeat(5, 50);
+    grid-template-columns: repeat(5, 10vh);
+    grid-template-rows: repeat(5, 10vh);
     margin: auto;
     position: relative;
-    width: 200px;
-    height: 200px;
+    width: 50vh;
+    height: 50vh;
 }
+
+#inner-border {
+    grid-column: 2 / 5;
+    grid-row: 2 / 5;
+    border: 1px solid black;
+}
+
 
 .letter {
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 24px; 
-    border: 2px solid gray;
-    border-radius: 8px;
+    border
 }
 
-#current-word {
-    font-size: 28px;
+#word-banner {
+    font-size: 24px;
     margin-bottom: 20px;
 }

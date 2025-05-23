@@ -36,8 +36,8 @@ function createLetterDiv(pos, index) {
     const div = document.createElement('div');
     div.className = "letter";
     // Set position
-    div.style.gridRow = pos[0] + 1;
-    div.style.gridColumn = pos[1] + 1;
+    div.style.gridRow = pos[0];
+    div.style.gridColumn = pos[1];
     // Display letter
     div.innerText = letterMap[index];
     // Add to board
