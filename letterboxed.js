@@ -31,6 +31,9 @@ const positions = [
   [4, 1], [3, 1], [2, 1],
 ];
 
+// Create divs for each letter
+positions.forEach(createLetterDiv);
+
 // Create a <div> element for each letter
 function createLetterDiv(pos, index) {
     const div = document.createElement('div');
@@ -48,13 +51,14 @@ function createLetterDiv(pos, index) {
 // Update displayed word at the top of the page
 function updateCurrentWord() {
     if (wordsStored.length > 0) {
-        document.getElementById('word-banner').innerText = "Current Word: " + wordsStored.join(' - ') + " - " + currentWord.join('');
+        document.getElementById('word-banner').innerText = wordsStored.join(' - ') + " - " + currentWord.join('');
     } else {
-        document.getElementById('word-banner').innerText = "Current Word: " + currentWord.join('');
+        document.getElementById('word-banner').innerText = currentWord.join('');
     }
     
 }
 
+// Gets previous letter in the word
 function getPreviousLetter() {
     let previousLetter = '';
     // Get current letter to determine if next letter is valid
@@ -68,11 +72,95 @@ function getPreviousLetter() {
     return previousLetter;
 }
 
+
+// Determine if a word is valid
+async function isValidWord(word) {
+    console.log(word);
+    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+    if (response.ok) {
+        return true;
+    } else return false;
+}
+
+// Find which side (0-3) a letter is on
+function FindSide(letter) {
+    // Iterate through each side
+    for(let i = 0; i < square.length; i++) {
+        // Find the index of the letter (-1 if not found)
+        const letterIndex = square[i].findIndex(l => l === letter);
+        // Return the index after a match
+        if (letterIndex !== -1) {
+            return i;
+        }
+    }
+}
+
+// Given the current letter, determine what is allowed to come next
+function ValidNextLetters(currentLetter) {
+    // Create shallow copy of square
+    let valid_letters = square.slice();
+    // If no letters have been entered yet
+    if (currentLetter === '') {
+        valid_letters = valid_letters.flat();
+    } else {
+        // Find current side
+        let currentSide = FindSide(currentLetter);
+        // Remove letters from current side
+        valid_letters.splice(currentSide, 1);
+        // Flatten into 1D array
+        valid_letters = valid_letters.flat();
+    }
+    // Return
+    return valid_letters;
+}
+
+// Check if the next letter in a word is valid
+function NextLetterIsValid(currentLetter, nextLetter) {
+    let validNextLetters = ValidNextLetters(currentLetter);
+    if (validNextLetters.findIndex(l => l === nextLetter) !== -1) {
+        return true;
+    } else return false;
+}
+
+// Grays out used letters
+function grayLetters(letter, addgray) {
+    letterDivs.forEach((div) => {
+        // If the letter matches the current <div>
+        if (div.innerText === letter) {
+            // Mark the letter as used
+            if (addgray) {
+                div.classList.add('used');
+            // Remove the gray if the letter hasn't been used previously
+            } else {
+                // Check how many times the letter is used in the current word
+                const countInCurrent = currentWord.filter(l => l === letter).length;
+                //Check how many times the letter is used in stored words using .reduce (initial value is 0)
+                const countInStored = wordsStored.reduce((count, word) => {
+                    return count + [...word].filter(l => l === letter).length
+                }, 0)
+                
+                // Get total count of used letters
+                const totalCount = countInCurrent + countInStored;
+                
+                // Only gray out letters not used anywhere
+                if (totalCount === 0) {
+                    letterDivs.forEach((div) => {
+                        if (div.innerText === letter) {
+                            div.classList.remove('used');
+                        }
+                    });
+                }
+            }
+        }
+    });
+}
+
 // Add listener for user input
 document.addEventListener('keydown', async (event) => {
-    const previousLetter = getPreviousLetter();
     // Standardize letters
     const letter = event.key.toUpperCase();
+    // Get previous letter
+    const previousLetter = getPreviousLetter();
     
     // Check if input is a letter using Regex 
     if (/^[A-Z]$/.test(letter)) {
@@ -128,100 +216,3 @@ document.addEventListener('keydown', async (event) => {
     // Update displayed word(s) at the top
     updateCurrentWord();
 })
-
-function grayLetters(letter, addgray) {
-    letterDivs.forEach((div) => {
-        // If the letter matches the current <div>
-        if (div.innerText === letter) {
-            // Mark the letter as used
-            if (addgray) {
-                div.classList.add('used');
-            // Remove the gray if the letter hasn't been used previously
-            } else {
-                // Check how many times the letter is used in the current word
-                const countInCurrent = currentWord.filter(l => l === letter).length;
-                //Check how many times the letter is used in stored words using .reduce (initial value is 0)
-                const countInStored = wordsStored.reduce((count, word) => {
-                    return count + [...word].filter(l => l === letter).length
-                }, 0)
-                
-                const totalCount = countInCurrent + countInStored;
-                
-                if (totalCount === 0) {
-                    letterDivs.forEach((div) => {
-                        if (div.innerText === letter) {
-                            div.classList.remove('used');
-                        }
-                    });
-                }
-                
-            }
-        }
-    })
-}
-
-// Determine if a word is valid
-async function isValidWord(word) {
-    console.log(word);
-    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
-    if (response.ok) {
-        return true;
-    } else return false;
-}
-
-// Find which side (0-3) a letter is on
-function FindSide(letter) {
-    // Iterate through each side
-    for(let i = 0; i < square.length; i++) {
-        // Find the index of the letter (-1 if not found)
-        const letterIndex = square[i].findIndex(l => l === letter);
-        // Return the index after a match
-        if (letterIndex !== -1) {
-            return i;
-        }
-    }
-}
-
-// Given the current letter, determine what is allowed to come next
-function ValidNextLetters(currentLetter) {
-    // Create shallow copy of square
-    let valid_letters = square.slice();
-    // If no letters have been entered yet
-    if (currentLetter === '') {
-        valid_letters = valid_letters.flat();
-    } else {
-        // Find current side
-        let currentSide = FindSide(currentLetter);
-        // Remove letters from current side
-        valid_letters.splice(currentSide, 1);
-        // Flatten into 1D array
-        valid_letters = valid_letters.flat();
-    }
-    // Return
-    return valid_letters;
-}
-
-// Check if the next letter in a word is valid
-function NextLetterIsValid(currentLetter, nextLetter) {
-    let validNextLetters = ValidNextLetters(currentLetter);
-    if (validNextLetters.findIndex(l => l === nextLetter) !== -1) {
-        return true;
-    } else return false;
-}
-
-
-// Create divs for each letter
-positions.forEach(createLetterDiv);
-
-// Word lookup
-//isValidWord("apple").then(valid => console.log("Valid word:", valid));
-
-// Find side
-//console.log("Side: ", FindSide('I'));
-
-// Get valid next letters
-//console.log("Valid Next Letters: ", ValidNextLetters('I'));
-
-// Determine if next letter is valid
-//console.log("Next letter is valid: ", NextLetterIsValid('I', 'W'));
-//console.log("Next letter is valid: ", NextLetterIsValid('I', 'J'));
