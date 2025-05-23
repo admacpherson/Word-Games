@@ -10,6 +10,16 @@ const square_order = ["Top", "Left", "Bottom", "Right"];
 let currentWord = [];
 let wordsStored = [];
 
+// Game board in HTML
+const board = document.getElementById('game-board');
+
+// 3 x 3 grid
+const positions = [
+    [0, 0], [0, 1], [0, 2],
+    [1, 0],         [1, 2],
+    [2, 0], [2, 1], [2, 2]
+];
+
 
 // Determine if a word is valid
 async function isValidWord(word) {
