@@ -50,11 +50,10 @@ function createLetterDiv(pos, index) {
 
 // Update displayed word at the top of the page
 function updateCurrentWord() {
-    if (wordsStored.length > 0) {
-        document.getElementById('word-banner').innerText = wordsStored.join(' - ') + " - " + currentWord.join('');
-    } else {
-        document.getElementById('word-banner').innerText = currentWord.join('');
-    }
+    // Update current word display
+    document.getElementById('word-banner').innerText = currentWord.join('');
+    // Updated stored word display
+    document.getElementById('stored-words').innerText = wordsStored.join(' - ');
     
 }
 
