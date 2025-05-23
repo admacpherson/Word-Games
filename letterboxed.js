@@ -1,9 +1,3 @@
-
-console.log("letterboxed.js loaded");
-console.log("document.readyState:", document.readyState);
-console.log("document.getElementById('game-board'):", document.getElementById('game-board'));
-
-
 // Define game board
 let topSide = ['W', 'M', 'Y'];
 let leftSide = ['S', 'L', 'R'];
@@ -19,11 +13,10 @@ let wordsStored = [];
 // Game board in HTML
 const board = document.getElementById("game-board");
 
-console.log("Game board: ", document.getElementById("game-board")); // will show null if it's missing
-
-
+// Create 1D array of all possible letters
 const letterMap = square.flat();
 
+//Placeholder array for letter <div> elements
 const letterDivs = [];
 
 // 3 x 3 grid
@@ -33,20 +26,39 @@ const positions = [
     [2, 0], [2, 1], [2, 2]
 ];
 
-// Create a div for each letter
+// Create a <div> element for each letter
 function createLetterDiv(pos, index) {
     const div = document.createElement('div');
     div.className = "letter";
     // Set position
     div.style.gridRow = pos[0] + 1;
     div.style.gridColumn = pos[1] + 1;
+    // Display letter
     div.innerText = letterMap[index];
     // Add to board
     board.appendChild(div);
     letterDivs.push(div);
 }
 
-positions.forEach(createLetterDiv);
+// Update displayed word at the top of the page
+function updateCurrentWord() {
+    document.getElementById('word-banner').innerText = "Current Word: " + currentWord.join('');
+}
+
+// Add listener for user input
+document.addEventListener('keydown', (event) => {
+    // Standardize letters
+    const letter = event.key.toUpperCase();
+    // Check if input is a letter using Regex 
+    if(/^[A-Z]$/.test(letter)) {
+        currentWord.push(letter);
+    // Input is backspace
+    } else if (event.key === 'Backspace') {
+        currentWord.pop();
+    }
+    // Update displayed word at the top
+    updateCurrentWord();
+})
 
 // Determine if a word is valid
 async function isValidWord(word) {
@@ -89,6 +101,9 @@ function NextLetterIsValid(currentLetter, nextLetter) {
     } else return false;
 }
 
+
+// Create divs for each letter
+positions.forEach(createLetterDiv);
 
 // Word lookup
 isValidWord("apple").then(valid => console.log("Valid word:", valid));
