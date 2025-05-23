@@ -297,14 +297,20 @@ document.addEventListener('keydown', async (event) => {
             let previousLetter = getPreviousLetter();
             // Update active/used dots
             colorDotsOnBackspace(removedLetter, previousLetter);
+            // Remove line
+            if (drawnLines.length > 0) {
+                const lastLine = drawnLines.pop();
+                lastLine.remove();
+            }
         // Backspace into last word
         } else if (wordsStored.length > 0 && currentWord.length === 1) {
+            // Get removed letter
+            const removedLetter = currentWord.pop();
             // Turn lastWord into currentWord
             const lastWord = wordsStored.pop();
             currentWord = lastWord.split('');
             // Change lines from solid to dashed
             makeLinesDashed(currentWord.length);
-            const removedLetter = currentWord.pop();
             // Remove gray from backspaced letter (if not otherwise used)
             grayLetters(removedLetter, false);
             // Update previous letter after removal
@@ -312,11 +318,7 @@ document.addEventListener('keydown', async (event) => {
             // Update active/used dots
             colorDotsOnBackspace(removedLetter, previousLetter);
         }
-        // Remove line
-        if (drawnLines.length > 0) {
-            const lastLine = drawnLines.pop();
-            lastLine.remove();
-        }
+        
         
     // Input is enter
     } else if (event.key === 'Enter') {
