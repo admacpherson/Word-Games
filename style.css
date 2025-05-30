@@ -13,6 +13,7 @@ body {
     border-bottom: 1px solid black;
     width: 33%;
     margin: auto;
+    max-width: 35vh;
 }
 
 #popup-banner {
