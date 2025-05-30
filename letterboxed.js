@@ -236,7 +236,7 @@ async function makeLinesSolid(wordLength) {
     for(const line of recentLines) {
         line.classList.remove("dashed-line");
         line.classList.add("solid-line");
-        await delay(100);
+        await delay(120);
     }
 }
 
@@ -404,7 +404,7 @@ document.addEventListener('keydown', async (event) => {
                 grayLetters(finishedWord);
                 
                 // Turn lines solid
-                makeLinesSolid(finishedWord.length);
+                await makeLinesSolid(finishedWord.length);
                 
             } else {
                 showBanner("Invalid word");
