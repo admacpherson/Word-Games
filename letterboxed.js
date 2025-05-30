@@ -222,17 +222,22 @@ function drawLineBetweenDots(dot1, dot2, className = "dashed-line") {
     drawnLines.push(line);
 }
 
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Make lines solid after finishing a word
-function makeLinesSolid(wordLength) {
+async function makeLinesSolid(wordLength) {
     // Get lines used in most recent word
     const numLines = wordLength - 1;
     const recentLines = drawnLines.slice(-numLines);
     
     // Turn solid
-    recentLines.forEach(line => {
+    for(const line of recentLines) {
         line.classList.remove("dashed-line");
         line.classList.add("solid-line");
-    })
+        await delay(100);
+    }
 }
 
 // Make lines solid after backspacing into a word
