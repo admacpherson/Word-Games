@@ -371,6 +371,42 @@ function handleBackspace(event) {
     }
 }
 
+async function handleEnter(event) {
+    // Min word length of 3
+    if (currentWord.length > 0 && currentWord.length < 3) {
+        showBanner("Too short");
+
+    // If at least 3 letters are entered
+    } else if (currentWord.length >= 3) {
+        //Convert array into a string
+        const finishedWord = currentWord.join('');
+
+        // Validate word
+        const isValid = await isValidWord(finishedWord);
+
+        // If word is valid
+        if (isValid) {
+            // Store finished word
+            wordsStored.push(finishedWord);
+
+            // Start next word with last letter
+            currentWord = [finishedWord.slice(-1)]
+
+            // Update display after async
+            updateCurrentWord();
+
+            // Update letter coloring
+            grayLetters(finishedWord);
+
+            // Turn lines solid
+            await makeLinesSolid(finishedWord.length);
+
+        } else {
+            showBanner("Invalid word");
+        }
+    }
+}
+
 // Listener for user input
 document.addEventListener('keydown', async (event) => {
     // Standardize letters
@@ -384,39 +420,7 @@ document.addEventListener('keydown', async (event) => {
         handleBackspace(event);
     // Input is enter
     } else if (event.key === 'Enter') {
-        // Min word length of 3
-        if (currentWord.length > 0 && currentWord.length < 3) {
-            showBanner("Too short");
-            
-        // If at least 3 letters are entered
-        } else if (currentWord.length >= 3) {
-            //Convert array into a string
-            const finishedWord = currentWord.join('');
-            
-            // Validate word
-            const isValid = await isValidWord(finishedWord);
-            
-            // If word is valid
-            if (isValid) {
-                // Store finished word
-                wordsStored.push(finishedWord);
-                
-                // Start next word with last letter
-                currentWord = [finishedWord.slice(-1)]
-                
-                // Update display after async
-                updateCurrentWord();
-                
-                // Update letter coloring
-                grayLetters(finishedWord);
-                
-                // Turn lines solid
-                await makeLinesSolid(finishedWord.length);
-                
-            } else {
-                showBanner("Invalid word");
-            }
-        }
+        handleEnter(event);
     }
     
     // Update displayed word(s) at the top
