@@ -60,6 +60,21 @@ body {
     border: 1px solid black;
 }
 
+button {
+    font-size: 20px;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 15px;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    width: 12vh;
+}
+
+button:hover {
+    background-color: blue;
+    color: white;
+}
 
 .letter {
     display: flex;

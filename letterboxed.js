@@ -1,39 +1,6 @@
-// Define game board
-let topSide = ['W', 'M', 'Y'];
-let rightSide = ['T', 'O', 'I'];
-let bottomSide = ['H', 'N', 'D'];
-let leftSide = ['S', 'L', 'R'];
-const square = [topSide, rightSide, bottomSide, leftSide];
-const square_order = ["Top", "Right", "Bottom", "Left"];
-
-// Define player words and lines
-let currentWord = [];
-let wordsStored = [];
-let drawnLines = [];
-
-// Game board in HTML
-const board = document.getElementById("game-board");
-
-// Create 1D array of all possible letters
-const letterMap = square.flat();
-
-//Placeholder array for letter <div> elements
-const letterDivs = [];
-
-// 5 x 5 grid with empty corners
-const positions = [
-  // Top row 
-  [1, 2], [1, 3], [1, 4],
-  // Right column
-  [2, 5], [3, 5], [4, 5],
-  // Bottom row
-  [5, 2], [5, 3], [5, 4],
-  // Left column
-  [2, 1], [3, 1], [4, 1],
-];
-
-// Create divs for each letter
-positions.forEach(createLetterDiv);
+/************
+**FUNCTIONS**
+*************/
 
 // Create a <div> element for each letter
 function createLetterDiv(pos, index) {
@@ -64,6 +31,17 @@ function createLetterDiv(pos, index) {
     letterDivs.push(div);
 }
 
+// Setup/reset game to initial state
+function resetGame() {
+    // Create divs for each letter
+    positions.forEach(createLetterDiv);
+    drawnLines.forEach(line => line.remove());
+    currentWord = [];
+    wordsStored = [];
+    drawnLines = [];
+    updateCurrentWord();
+}
+
 // Update displayed word at the top of the page
 function updateCurrentWord() {
     // Update current word display
@@ -73,6 +51,7 @@ function updateCurrentWord() {
     document.getElementById('stored-words').innerText = wordsStored.join(' - ');
 }
 
+// Prompt user with temporary banner
 function showBanner(bannerText) {
     // Show banner
     const banner = document.getElementById('popup-banner');
@@ -188,7 +167,6 @@ function grayLetters(letter, addgray) {
     });
 }
 
-
 // Draw lines between dots of selected letters
 function drawLineBetweenDots(dot1, dot2, className = "dashed-line") {
     //Get positions of dots relative to viewport
@@ -222,6 +200,7 @@ function drawLineBetweenDots(dot1, dot2, className = "dashed-line") {
     drawnLines.push(line);
 }
 
+// Create using async promise for specified time
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -296,8 +275,8 @@ function colorDotsOnBackspace(removedLetter, previousLetter) {
     }
 }
 
-function handleLetter(event, letter) {
-    
+// Handler for letter input
+function handleLetter(letter) {
     // Get previous letter
     let previousLetter = getPreviousLetter();
     
@@ -324,10 +303,13 @@ function handleLetter(event, letter) {
 
         // Add the new letter to the current word
         currentWord.push(letter);
-    } 
+    }
+    // Update
+    updateCurrentWord();
 }
 
-function handleBackspace(event) {
+// Handler for backspace input
+function handleBackspace() {
     // Don't allow user to remove first letter of adjacent word
     if (wordsStored.length === 0 || currentWord.length > 1) {
         // Get removed letter
@@ -369,9 +351,12 @@ function handleBackspace(event) {
         // Update active/used dots
         colorDotsOnBackspace(removedLetter, previousLetter);
     }
+    // Update
+    updateCurrentWord();
 }
 
-async function handleEnter(event) {
+// Handler for enter key input
+async function handleEnter() {
     // Min word length of 3
     if (currentWord.length > 0 && currentWord.length < 3) {
         showBanner("Too short");
@@ -405,24 +390,65 @@ async function handleEnter(event) {
             showBanner("Invalid word");
         }
     }
+    // Update
+    updateCurrentWord();
 }
 
-// Listener for user input
+/************
+**MAIN CODE**
+*************/
+
+// Define game board
+let topSide = ['W', 'M', 'Y'];
+let rightSide = ['T', 'O', 'I'];
+let bottomSide = ['H', 'N', 'D'];
+let leftSide = ['S', 'L', 'R'];
+const square = [topSide, rightSide, bottomSide, leftSide];
+const square_order = ["Top", "Right", "Bottom", "Left"];
+
+// Define player words and lines
+let currentWord = [];
+let wordsStored = [];
+let drawnLines = [];
+
+// Game board in HTML
+const board = document.getElementById("game-board");
+
+// Create 1D array of all possible letters
+const letterMap = square.flat();
+
+//Placeholder array for letter <div> elements
+const letterDivs = [];
+
+// 5 x 5 grid with empty corners
+const positions = [
+  // Top row 
+  [1, 2], [1, 3], [1, 4],
+  // Right column
+  [2, 5], [3, 5], [4, 5],
+  // Bottom row
+  [5, 2], [5, 3], [5, 4],
+  // Left column
+  [2, 1], [3, 1], [4, 1],
+];
+
+// Create gameboard and start game
+resetGame();
+
+// Listener for user input from keyboard
 document.addEventListener('keydown', async (event) => {
     // Standardize letters
     const letter = event.key.toUpperCase();
     
     // Check if input is a letter using Regex 
     if (/^[A-Z]$/.test(letter)) {
-        handleLetter(event, letter);
+        handleLetter(letter);
     // Input is backspace
     } else if (event.key === 'Backspace') {
-        handleBackspace(event);
+        handleBackspace();
     // Input is enter
     } else if (event.key === 'Enter') {
-        handleEnter(event);
+        handleEnter();
     }
     
-    // Update displayed word(s) at the top
-    updateCurrentWord();
 })
