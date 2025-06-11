@@ -327,6 +327,50 @@ function handleLetter(event, letter) {
     } 
 }
 
+function handleBackspace(event) {
+    // Don't allow user to remove first letter of adjacent word
+    if (wordsStored.length === 0 || currentWord.length > 1) {
+        // Get removed letter
+        const removedLetter = currentWord.pop();
+
+        // Update coloring for removed letter
+        grayLetters(removedLetter, false);
+
+        // Get new previous letter after removal
+        let previousLetter = getPreviousLetter();
+
+        // Update active/used dots
+        colorDotsOnBackspace(removedLetter, previousLetter);
+
+        // Remove line
+        if (drawnLines.length > 0) {
+            const lastLine = drawnLines.pop();
+            lastLine.remove();
+        }
+
+    // Backspace into last word
+    } else if (wordsStored.length > 0 && currentWord.length === 1) {
+        // Get removed letter
+        const removedLetter = currentWord.pop();
+
+        // Turn lastWord into currentWord
+        const lastWord = wordsStored.pop();
+        currentWord = lastWord.split('');
+
+        // Change lines from solid to dashed
+        makeLinesDashed(currentWord.length);
+
+        // Remove color from backspaced letter (if not otherwise used)
+        grayLetters(removedLetter, false);
+
+        // Update previous letter after removal
+        let previousLetter = getPreviousLetter();
+
+        // Update active/used dots
+        colorDotsOnBackspace(removedLetter, previousLetter);
+    }
+}
+
 // Listener for user input
 document.addEventListener('keydown', async (event) => {
     // Standardize letters
@@ -337,48 +381,7 @@ document.addEventListener('keydown', async (event) => {
         handleLetter(event, letter);
     // Input is backspace
     } else if (event.key === 'Backspace') {
-        // Don't allow user to remove first letter of adjacent word
-        if (wordsStored.length === 0 || currentWord.length > 1) {
-            // Get removed letter
-            const removedLetter = currentWord.pop();
-            
-            // Update coloring for removed letter
-            grayLetters(removedLetter, false);
-            
-            // Get new previous letter after removal
-            let previousLetter = getPreviousLetter();
-            
-            // Update active/used dots
-            colorDotsOnBackspace(removedLetter, previousLetter);
-            
-            // Remove line
-            if (drawnLines.length > 0) {
-                const lastLine = drawnLines.pop();
-                lastLine.remove();
-            }
-            
-        // Backspace into last word
-        } else if (wordsStored.length > 0 && currentWord.length === 1) {
-            // Get removed letter
-            const removedLetter = currentWord.pop();
-            
-            // Turn lastWord into currentWord
-            const lastWord = wordsStored.pop();
-            currentWord = lastWord.split('');
-            
-            // Change lines from solid to dashed
-            makeLinesDashed(currentWord.length);
-            
-            // Remove color from backspaced letter (if not otherwise used)
-            grayLetters(removedLetter, false);
-            
-            // Update previous letter after removal
-            let previousLetter = getPreviousLetter();
-            
-            // Update active/used dots
-            colorDotsOnBackspace(removedLetter, previousLetter);
-        }
-        
+        handleBackspace(event);
     // Input is enter
     } else if (event.key === 'Enter') {
         // Min word length of 3
