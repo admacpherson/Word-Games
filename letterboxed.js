@@ -296,10 +296,7 @@ function colorDotsOnBackspace(removedLetter, previousLetter) {
     }
 }
 
-// Listener for user input
-document.addEventListener('keydown', async (event) => {
-    // Standardize letters
-    const letter = event.key.toUpperCase();
+function handleLetter(event, letter) {
     
     // Get previous letter
     let previousLetter = getPreviousLetter();
@@ -308,29 +305,36 @@ document.addEventListener('keydown', async (event) => {
     const currentDiv = letterDivs.find(div => div.innerText === letter);
     const prevDiv = letterDivs.find(div => div.innerText === previousLetter);
     
+    if (nextLetterIsValid(previousLetter, letter)) {
+        // Make letters used
+        grayLetters(letter, true);       
+
+        // Draw line and update dots
+        if (prevDiv && currentDiv) {
+            //Get dot child for each letter div
+            const prevDot = prevDiv.querySelector('.dot');
+            const currDot = currentDiv.querySelector('.dot');
+
+            // If children exist, draw lines and update coloring
+            if(prevDot && currDot) {
+                drawLineBetweenDots(prevDot, currDot);
+                colorDots(prevDot, currDot);
+            }
+        }
+
+        // Add the new letter to the current word
+        currentWord.push(letter);
+    } 
+}
+
+// Listener for user input
+document.addEventListener('keydown', async (event) => {
+    // Standardize letters
+    const letter = event.key.toUpperCase();
+    
     // Check if input is a letter using Regex 
     if (/^[A-Z]$/.test(letter)) {
-        if (nextLetterIsValid(previousLetter, letter)) {
-            // Make letters used
-            grayLetters(letter, true);       
-            
-            // Draw line and update dots
-            if (prevDiv && currentDiv) {
-                //Get dot child for each letter div
-                const prevDot = prevDiv.querySelector('.dot');
-                const currDot = currentDiv.querySelector('.dot');
-                
-                // If children exist, draw lines and update coloring
-                if(prevDot && currDot) {
-                    drawLineBetweenDots(prevDot, currDot);
-                    colorDots(prevDot, currDot);
-                }
-            }
-            
-            // Add the new letter to the current word
-            currentWord.push(letter);
-        } 
-        
+        handleLetter(event, letter);
     // Input is backspace
     } else if (event.key === 'Backspace') {
         // Don't allow user to remove first letter of adjacent word
