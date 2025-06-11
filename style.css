@@ -60,6 +60,12 @@ body {
     border: 1px solid black;
 }
 
+#game-board, .letter {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
 button {
     font-size: 20px;
     padding: 10px;
@@ -69,6 +75,8 @@ button {
     color: black;
     border: 1px solid black;
     width: 12vh;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 button:hover {

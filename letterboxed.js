@@ -394,9 +394,9 @@ async function handleEnter() {
     updateCurrentWord();
 }
 
-/************
-**MAIN CODE**
-*************/
+/*************
+**GAME SETUP**
+**************/
 
 // Define game board
 let topSide = ['W', 'M', 'Y'];
@@ -434,6 +434,55 @@ const positions = [
 
 // Create gameboard and start game
 resetGame();
+
+/*****************
+**INPUT HANDLING**
+*****************/
+
+function setupPointerListeners() {
+    // Used to track when the user is dragging/holding down
+    let pointerDown = false;
+    
+    // Handle initial tap/click by adding listener to each letter
+    letterDivs.forEach(div => {
+       div.addEventListener('pointerdown', e => {
+           // User is currently holding down
+           pointerDown = true;
+           
+           // Get current and previous letters
+           const currentLetter = div.innerText;
+           const previousLetter = getPreviousLetter();
+           
+           // If next letter is valid, pass to handlers
+           if (nextLetterIsValid(previousLetter, currentLetter)) {
+               handleLetter(currentLetter);
+           }
+       }) 
+        
+        // Handle swiping/dragging to new letter
+        div.addEventListener('pointerenter', () => {
+            // If pointer is up, exit function
+            if (!pointerDown) {
+                return;
+            }
+
+            // Get current and previous letters
+            const currentLetter = div.innerText;
+            const previousLetter = getPreviousLetter();
+
+            if (nextLetterIsValid(currentLetter, previousLetter)) {
+                handleLetter(currentLetter);
+            }
+        });
+
+        //Handle lift/tap end
+        div.addEventListener('pointerup', () => {
+            pointerDown = false;
+        });
+    });
+}
+
+setupPointerListeners();
 
 // Listener for user input from keyboard
 document.addEventListener('keydown', async (event) => {
