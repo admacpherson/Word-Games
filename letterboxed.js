@@ -1,3 +1,55 @@
+/*************
+**GAME SETUP**
+**************/
+
+// Define game board
+let topSide = ['W', 'M', 'Y'];
+let rightSide = ['T', 'O', 'I'];
+let bottomSide = ['H', 'N', 'D'];
+let leftSide = ['S', 'L', 'R'];
+const square = [topSide, rightSide, bottomSide, leftSide];
+const square_order = ["Top", "Right", "Bottom", "Left"];
+
+// Define player words and lines
+let currentWord = [];
+let wordsStored = [];
+let drawnLines = [];
+
+// Game board in HTML
+const board = document.getElementById("game-board");
+
+// Create 1D array of all possible letters
+const letterMap = square.flat();
+
+//Placeholder array for letter <div> elements
+const letterDivs = [];
+
+// 5 x 5 grid with empty corners
+const positions = [
+  // Top row 
+  [1, 2], [1, 3], [1, 4],
+  // Right column
+  [2, 5], [3, 5], [4, 5],
+  // Bottom row
+  [5, 2], [5, 3], [5, 4],
+  // Left column
+  [2, 1], [3, 1], [4, 1],
+];
+
+// Create preview line element
+const previewLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+// Set id 
+previewLine.setAttribute("id", "preview-line");
+// Make preview line dashed
+previewLine.classList.add("dashed-line");
+// Make invisible
+previewLine.style.display = "none";
+// Add to line layer 
+document.getElementById("line-layer").appendChild(previewLine);
+
+// Create gameboard and start game
+resetGame();
+
 /************
 **FUNCTIONS**
 *************/
@@ -135,6 +187,11 @@ function nextLetterIsValid(currentLetter, nextLetter) {
     } else return false;
 }
 
+// Create using async promise for specified time
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Grays out used letters
 function grayLetters(letter, addgray) {
     letterDivs.forEach((div) => {
@@ -165,6 +222,52 @@ function grayLetters(letter, addgray) {
             }
         }
     });
+}
+
+// Return the dot element of the most recent letter
+function getLastSelectedDot() {
+    // Get previous letter
+    const lastLetter = getPreviousLetter();
+    
+    // Get corresponding div based on match
+    const lastDiv = letterDivs.find(div => div.innerText === lastLetter);
+    
+    // Return if match
+    if (!lastDiv) {
+        return null
+    } else {
+        // Get the dot element
+        return lastDiv.querySelector(".dot");
+    }
+}
+
+// Updates preview line that follows user
+function updatePreviewLine(dot, pointerX, pointerY) {
+    // Get position of origin dot
+    const rect1 = dot.getBoundingClientRect();
+    // Get board position
+    const boardRect = document.getElementById('game-board').getBoundingClientRect();
+    
+    // Compute center coordinates of dots relative to board
+    const x1 = (rect1.left + rect1.width / 2) - boardRect.left;
+    const y1 = (rect1.top + rect1.height / 2) - boardRect.top;
+    const x2 = pointerX - boardRect.left;
+    const y2 = pointerY - boardRect.top;
+    
+    // Update preview line with current coordinates
+    const line = document.getElementById("preview-line");
+    line.setAttribute("x1", x1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y1", y1);
+    line.setAttribute("y2", y2);
+    
+    // Make line visible
+    line.style.display = "block";
+}
+
+// Hide trailing line when not in use
+function hidePreviewLine() {
+    document.getElementById("preview-line").style.display = "none";
 }
 
 // Draw lines between dots of selected letters
@@ -198,11 +301,6 @@ function drawLineBetweenDots(dot1, dot2, className = "dashed-line") {
     document.getElementById("line-layer").appendChild(line);
     
     drawnLines.push(line);
-}
-
-// Create using async promise for specified time
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Make lines solid after finishing a word
@@ -394,54 +492,12 @@ async function handleEnter() {
     updateCurrentWord();
 }
 
-/*************
-**GAME SETUP**
-**************/
-
-// Define game board
-let topSide = ['W', 'M', 'Y'];
-let rightSide = ['T', 'O', 'I'];
-let bottomSide = ['H', 'N', 'D'];
-let leftSide = ['S', 'L', 'R'];
-const square = [topSide, rightSide, bottomSide, leftSide];
-const square_order = ["Top", "Right", "Bottom", "Left"];
-
-// Define player words and lines
-let currentWord = [];
-let wordsStored = [];
-let drawnLines = [];
-
-// Game board in HTML
-const board = document.getElementById("game-board");
-
-// Create 1D array of all possible letters
-const letterMap = square.flat();
-
-//Placeholder array for letter <div> elements
-const letterDivs = [];
-
-// 5 x 5 grid with empty corners
-const positions = [
-  // Top row 
-  [1, 2], [1, 3], [1, 4],
-  // Right column
-  [2, 5], [3, 5], [4, 5],
-  // Bottom row
-  [5, 2], [5, 3], [5, 4],
-  // Left column
-  [2, 1], [3, 1], [4, 1],
-];
-
-// Create gameboard and start game
-resetGame();
-
-/*****************
-**INPUT HANDLING**
-*****************/
-
+// Pointer listeners to track clicking/tapping/dragging
 function setupPointerListeners() {
     // Used to track when the user is dragging/holding down
     let pointerDown = false;
+    
+    
     
     // Handle initial tap/click by adding listener to each letter
     letterDivs.forEach(div => {
@@ -474,14 +530,31 @@ function setupPointerListeners() {
                 handleLetter(currentLetter);
             }
         });
-
+        
         //Handle lift/tap end
         div.addEventListener('pointerup', () => {
             pointerDown = false;
+            hidePreviewLine();
         });
+        
     });
+    
+    // Handle movement and add trailing line
+    document.addEventListener('pointermove', e => {
+        // Get the dot element of the last letter
+        const lastSelectedDot = getLastSelectedDot();
+
+        // Do nothing if not found
+        if (!lastSelectedDot) return;
+
+        //Otherwise update the preview line with the user's coordinates
+        updatePreviewLine(lastSelectedDot, e.clientX, e.clientY);
+    });
+
+
 }
 
+// Implement various pointer listeners
 setupPointerListeners();
 
 // Listener for user input from keyboard
