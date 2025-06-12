@@ -46,6 +46,8 @@ previewLine.classList.add("dashed-line");
 previewLine.style.display = "none";
 // Add to line layer 
 document.getElementById("line-layer").appendChild(previewLine);
+// Add a margin to allow the user to draw outisde the exact game board
+const previewMargin = 100;
 
 /************
 **FUNCTIONS**
@@ -521,8 +523,19 @@ function setupPointerListeners() {
         
         // Handle swiping/dragging to new letter
         div.addEventListener('pointerenter', () => {
-            // If pointer is up, exit function
-            if (!pointerDown) {
+            // Get boundaries of inner board
+            const innerRect = document.getElementById("inner-border").getBoundingClientRect();
+
+            // Determine if the user's cursor is inside the board
+            const isInsideBorder = 
+                  e.clientX >= innerRect.left - previewMargin &&
+                  e.clientX <= innerRect.right + previewMargin &&
+                  e.clientY >= innerRect.top - previewMargin &&
+                  e.clientY <= innerRect.bottom + previewMargin;
+
+            
+            // If pointer is up or user is outside game board, exit function
+            if (!pointerDown || !isInsideBorder) {
                 return;
             }
 
@@ -553,12 +566,11 @@ function setupPointerListeners() {
         
         // Determine if the user's cursor is inside the board
         const isInsideBorder = 
-              e.clientX >= innerRect.left &&
-              e.clientX <= innerRect.right &&
-              e.clientY >= innerRect.top &&
-              e.clientY <= innerRect.bottom;
-        
-        
+              e.clientX >= innerRect.left - previewMargin &&
+              e.clientX <= innerRect.right + previewMargin &&
+              e.clientY >= innerRect.top - previewMargin &&
+              e.clientY <= innerRect.bottom + previewMargin;
+
 
         // Do nothing if not found or user is not dragging and holding or user is outside the game boarder
         if (!lastSelectedDot || !pointerDown || !isInsideBorder) {
