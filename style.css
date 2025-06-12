@@ -10,9 +10,9 @@ body {
 }
 
 #word-banner {
-    font-size: 4vw;
+    font-size: 2vw;
     min-height: 2em;
-    margin-bottom: -2vw;
+    margin-bottom: -1vw;
 }
 
 #word-banner-underline {
@@ -20,11 +20,12 @@ body {
     width: 50%;
     margin: auto;
     max-width: 35vh;
+    margin-bottom: -1vw
 }
 
 #popup-banner {
     position: fixed;
-    top: 80px;
+    top: 10vh;
     left: 50%;
     transform: translateX(-50%);
     background-color: rgba(255, 77, 77, 0.95);
@@ -34,7 +35,7 @@ body {
     box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.3);
     z-index: 999;
     transition: opacity 0.5s ease;
-    font-size: 4vw;
+    font-size: 1.5vw;
 }
 
 .hidden {
@@ -48,9 +49,8 @@ body {
 
 #stored-words {
     margin-top: 20px;
-    margin-bottom: -5vw;
     min-height: 1.5em;
-    font-size: 4vw;
+    font-size: 1.5vw;
 }
 
 #game-board {
@@ -59,7 +59,6 @@ body {
     grid-template-rows: repeat(5, 10vh);
     margin: auto;
     margin-top: auto;
-    margin-bottom: 4vw;
     position: relative;
     width: 50vh;
     height: 50vh;
@@ -79,15 +78,22 @@ body {
     -ms-user-select: none;
 }
 
+#buttons {
+    width: 50vh;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 button {
-    font-size: 2em;
+    width: 30%;
+    max-width: 30%;
+    font-size: 1.5em;
     padding: 10px;
     margin: 5px;
     border-radius: 15px;
     background-color: white;
     color: black;
     border: 1px solid black;
-    width: 15vw;
     cursor: pointer;
     transition: background-color 0.2s;
 }
@@ -177,8 +183,25 @@ button:hover {
 }
 
 @media (max-width: 768px) {
+    #word-banner {
+        margin-bottom: -2vw;
+    }
+
     #word-banner-underline {
         width: 67%;
+        margin-bottom: -2vw;
+    }
+    
+    #word-banner {
+        font-size: 4vw;
+    }
+    
+    #popup-banner {
+        font-size: 4vw;
+    }
+    
+    #stored-words {
+        font-size: 4vw;
     }
     
     button {
