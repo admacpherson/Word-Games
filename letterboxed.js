@@ -47,9 +47,6 @@ previewLine.style.display = "none";
 // Add to line layer 
 document.getElementById("line-layer").appendChild(previewLine);
 
-// Create gameboard and start game
-resetGame();
-
 /************
 **FUNCTIONS**
 *************/
@@ -91,7 +88,9 @@ function resetGame() {
     currentWord = [];
     wordsStored = [];
     drawnLines = [];
+    hidePreviewLine();
     updateCurrentWord();
+    setupPointerListeners();
 }
 
 // Update displayed word at the top of the page
@@ -245,14 +244,21 @@ function getLastSelectedDot() {
 function updatePreviewLine(dot, pointerX, pointerY) {
     // Get position of origin dot
     const rect1 = dot.getBoundingClientRect();
-    // Get board position
-    const boardRect = document.getElementById('game-board').getBoundingClientRect();
+    
+    // Get board container coordinates
+    const boardRect = document.getElementById("game-board").getBoundingClientRect();
+    // Get inner board (3x3) coordinates
+    const innerRect = document.getElementById("inner-border").getBoundingClientRect();
+    
+    // Clamp pointer coords to board boundaries
+    const clampedX = Math.min(Math.max(pointerX, innerRect.left) + 2, innerRect.right - 2);
+    const clampedY = Math.min(Math.max(pointerY, innerRect.top) + 2, innerRect.bottom - 2);
     
     // Compute center coordinates of dots relative to board
     const x1 = (rect1.left + rect1.width / 2) - boardRect.left;
     const y1 = (rect1.top + rect1.height / 2) - boardRect.top;
-    const x2 = pointerX - boardRect.left;
-    const y2 = pointerY - boardRect.top;
+    const x2 = clampedX - boardRect.left;
+    const y2 = clampedY - boardRect.top;
     
     // Update preview line with current coordinates
     const line = document.getElementById("preview-line");
@@ -497,8 +503,6 @@ function setupPointerListeners() {
     // Used to track when the user is dragging/holding down
     let pointerDown = false;
     
-    
-    
     // Handle initial tap/click by adding listener to each letter
     letterDivs.forEach(div => {
        div.addEventListener('pointerdown', e => {
@@ -544,18 +548,17 @@ function setupPointerListeners() {
         // Get the dot element of the last letter
         const lastSelectedDot = getLastSelectedDot();
 
-        // Do nothing if not found
-        if (!lastSelectedDot) return;
+        // Do nothing if not found or user is not dragging and holding
+        if (!lastSelectedDot || !pointerDown) return;
 
         //Otherwise update the preview line with the user's coordinates
         updatePreviewLine(lastSelectedDot, e.clientX, e.clientY);
     });
-
-
 }
 
-// Implement various pointer listeners
-setupPointerListeners();
+/*******
+**MAIN**
+********/
 
 // Listener for user input from keyboard
 document.addEventListener('keydown', async (event) => {
@@ -572,5 +575,8 @@ document.addEventListener('keydown', async (event) => {
     } else if (event.key === 'Enter') {
         handleEnter();
     }
-    
+    hidePreviewLine();
 })
+
+// Create gameboard and start game
+resetGame();
