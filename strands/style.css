@@ -1,13 +1,19 @@
 body, html {
     font-family: Arial, sans-serif;
     text-align: center;
+   
+}
+
+body {
+    margin-left: 15vh;
+    margin-right: 15vh;
 }
 
 #prompt-box {
+    margin-top: 5vh;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 1em;
-    max-width: 70%;
     text-align: center;
     border-radius: 15px;
     border: 1px solid gray;
@@ -28,10 +34,13 @@ body, html {
 
 #grid {
     display: grid;
-    grid-template-columns: repeat(6, 50px);
-    grid-template-rows: repeat(8, 50px);
-    gap: 6px;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 1.5vw;
     user-select: none;
-    margin: auto;
-    width: max-content;
+    margin-top: 10vw;
+    margin-left: auto;
+    margin-right: auto;
+    height: 75vw;
+    font-size: 1.5em;
 }
