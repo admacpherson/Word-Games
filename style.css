@@ -185,15 +185,12 @@ button:hover {
 @media (max-width: 768px) {
     #word-banner {
         margin-bottom: -2vw;
+        font-size: 4vw;
     }
 
     #word-banner-underline {
         width: 67%;
         margin-bottom: -2vw;
-    }
-    
-    #word-banner {
-        font-size: 4vw;
     }
     
     #popup-banner {
@@ -208,5 +205,29 @@ button:hover {
         font-size: 3vw;
         padding: 0.5em;
         width: 24vw;
+    }
+}
+
+
+@media (max-width: 550px) {
+    #word-banner-underline {
+        width: 67%;
+        margin-bottom: -2vw;
+    }
+    
+    #word-banner {
+        font-size: 8vw;
+    }
+    
+    #popup-banner {
+        font-size: 8vw;
+    }
+    
+    #stored-words {
+        font-size: 8vw;
+    }
+    
+    button {
+        font-size: 6vw;
     }
 }
