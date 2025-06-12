@@ -522,7 +522,7 @@ function setupPointerListeners() {
        }) 
         
         // Handle swiping/dragging to new letter
-        div.addEventListener('pointerenter', () => {
+        div.addEventListener('pointerenter', (e) => {
             // Get boundaries of inner board
             const innerRect = document.getElementById("inner-border").getBoundingClientRect();
 
