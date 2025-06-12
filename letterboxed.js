@@ -576,7 +576,15 @@ function setupPointerListeners() {
         if (!lastSelectedDot || !pointerDown || !isInsideBorder) {
             hidePreviewLine();
             return;
-        } 
+        }
+        
+        // Detect if letter is being swiped over
+        // Get element user is touching
+        const touchedElement = document.elementFromPoint(e.clientX, e.clientY);
+        // If the user is on an eleement and it is a letter, handle the selection
+        if (touchedElement && touchedElement.classList.contains("letter")) {
+            handleLetter(touchedElement.innerText);
+        }
 
         //Otherwise update the preview line with the user's coordinates
         updatePreviewLine(lastSelectedDot, e.clientX, e.clientY);
