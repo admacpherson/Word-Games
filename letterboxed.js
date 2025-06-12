@@ -547,9 +547,24 @@ function setupPointerListeners() {
     document.addEventListener('pointermove', e => {
         // Get the dot element of the last letter
         const lastSelectedDot = getLastSelectedDot();
+        
+        // Get boundaries of inner board
+        const innerRect = document.getElementById("inner-border").getBoundingClientRect();
+        
+        // Determine if the user's cursor is inside the board
+        const isInsideBorder = 
+              e.clientX >= innerRect.left &&
+              e.clientX <= innerRect.right &&
+              e.clientY >= innerRect.top &&
+              e.clientY <= innerRect.bottom;
+        
+        
 
-        // Do nothing if not found or user is not dragging and holding
-        if (!lastSelectedDot || !pointerDown) return;
+        // Do nothing if not found or user is not dragging and holding or user is outside the game boarder
+        if (!lastSelectedDot || !pointerDown || !isInsideBorder) {
+            hidePreviewLine();
+            return;
+        } 
 
         //Otherwise update the preview line with the user's coordinates
         updatePreviewLine(lastSelectedDot, e.clientX, e.clientY);
