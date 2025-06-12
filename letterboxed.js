@@ -406,6 +406,15 @@ function handleLetter(letter) {
                 colorDots(prevDot, currDot);
             }
         }
+        
+        // Handle first dot of the game and mark as active
+        if (currentDiv.querySelector('.dot')){
+            const currDot = currentDiv.querySelector('.dot');
+            if (currDot) {
+                // Set dot to active
+                currDot.classList.add("current-dot");
+            }
+        }
 
         // Add the new letter to the current word
         currentWord.push(letter);
