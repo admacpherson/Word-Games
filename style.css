@@ -48,6 +48,7 @@ body {
 
 #stored-words {
     margin-top: 20px;
+    margin-bottom: -5vw;
     min-height: 1.5em;
     font-size: 4vw;
 }
@@ -57,6 +58,8 @@ body {
     grid-template-columns: repeat(5, 10vh);
     grid-template-rows: repeat(5, 10vh);
     margin: auto;
+    margin-top: auto;
+    margin-bottom: 4vw;
     position: relative;
     width: 50vh;
     height: 50vh;
@@ -98,7 +101,7 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2em; 
+    font-size: 1.5em; 
     position: relative;
 }
 
@@ -179,7 +182,7 @@ button:hover {
     }
     
     button {
-        font-size: 4.5vw;
+        font-size: 3vw;
         padding: 0.5em;
         width: 24vw;
     }
