@@ -1,5 +1,6 @@
 body, html {
     font-family: Arial, sans-serif;
+    text-align: center;
 }
 
 #prompt-box {
@@ -31,4 +32,6 @@ body, html {
     grid-template-rows: repeat(8, 50px);
     gap: 6px;
     user-select: none;
+    margin: auto;
+    width: max-content;
 }
