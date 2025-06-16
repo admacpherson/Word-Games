@@ -49,6 +49,9 @@ function createGrid() {
 let isDragging = false;
 // Keep track of whether user has been dragging/swiping
 let hasDragged = false;
+let dragStartX = 0;
+let dragStartY = 0;
+const dragThreshold = 10;
 // Store letters that have been selected
 let selectedCells = [];
 // Keep track of current word
@@ -116,14 +119,27 @@ grid.addEventListener("pointerdown", (e) => {
     isDragging = true;
     // Reset drag status
     hasDragged = false;
+    
+    // Keep track of dragging
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    
+    // Select cell
+    selectCell(e.target);
 });
 
 // Pointer movement event listener
 grid.addEventListener("pointermove", (e) => {
     // Ignore if the user isn't holding down or on the grid
-    if (!isDragging || !e.target.classList.contains("cell")) {
-        return;
-    }
+    if (!isDragging || !e.target.classList.contains("cell")) return;
+    
+    // Calculate distance moved in drag
+    const dx = e.clientX - dragStartX;
+    const dy = e.clientY - dragStartY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    
+    // Only register drag after threshold to prevent small movements
+    if (distance < dragThreshold) return;
     
     if(!selectedCells.includes(e.target) && isDragging) {
         //Select the cell the user moves over
@@ -131,7 +147,6 @@ grid.addEventListener("pointermove", (e) => {
         // Note the user has been dragging
         hasDragged = true;
     }
-    
 });
 
 // Pointer up event listener
