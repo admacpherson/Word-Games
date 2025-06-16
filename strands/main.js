@@ -1,8 +1,8 @@
-/**************
-**CREATE GRID**
-***************/
+/******************
+**SETUP/VARIABLES**
+*******************/
 
-// Grid size
+// Set grid size
 const numRows = 8;
 const numCols = 6;
 
@@ -23,6 +23,22 @@ const validWords = ['APPLE', 'GRAPE', 'PEAR', 'MANGO'];
 
 // Grid div element
 const grid = document.getElementById("grid");
+
+// Keep track of whether user is dragging/swiping
+let isDragging = false;
+// Keep track of whether user has been dragging/swiping
+let hasDragged = false;
+let dragStartX = 0;
+let dragStartY = 0;
+const dragThreshold = 10;
+// Store letters that have been selected
+let selectedCells = [];
+// Keep track of current word
+let selectedWord = "";
+
+/**************
+**CREATE GRID**
+***************/
 
 // Create a div element with class "cell" and an index
 function createCell(letter, row, col) {
@@ -45,18 +61,6 @@ function createGrid() {
     }
 }
 
-// Keep track of whether user is dragging/swiping
-let isDragging = false;
-// Keep track of whether user has been dragging/swiping
-let hasDragged = false;
-let dragStartX = 0;
-let dragStartY = 0;
-const dragThreshold = 10;
-// Store letters that have been selected
-let selectedCells = [];
-// Keep track of current word
-let selectedWord = "";
-
 createGrid();
 resetSelection();
 updateBannerText("Test");
@@ -70,6 +74,7 @@ function getCellByIndex(i) {
     return grid.querySelector(`".cell[data-row="${row}"][data-col="${col}"]"`);
 }
 
+// Helper function to check if cells are adjacent
 function isAdjacent(cell1, cell2) {
     // Get row/col coordinates
     const row1 = cell1.dataset.row;
@@ -85,6 +90,10 @@ function isAdjacent(cell1, cell2) {
     
     return isAdjacent;
 }
+
+/*********************
+**GAMEPLAY FUNCTIONS**
+**********************/
 
 // Mark a cell/letter as selected
 function selectCell(cell) {
@@ -132,6 +141,7 @@ function updateBannerText(message) {
     document.getElementById("message").innerText = message;
 }
 
+// Handle guesses to check for correct words
 function handleGuess() {
     //Join all selected cells into an overall word
     selectedWord = selectedCells.map(cell => cell.textContent).join('');
@@ -152,6 +162,7 @@ function handleGuess() {
     resetSelection();
 }
 
+// Draw lines between cells
 function drawLinesBetweenCells(cells, permanent = false) {
     // Get line layer and coordinates as JS element
     const svg = document.getElementById("line-layer");
@@ -185,9 +196,9 @@ function drawLinesBetweenCells(cells, permanent = false) {
     }
 }
 
-/*************
-**USER INPUT**
-**************/
+/*****************
+**INPUT HANDLERS**
+******************/
 
 // Pointer down event listener
 grid.addEventListener("pointerdown", (e) => {
