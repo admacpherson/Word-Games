@@ -79,6 +79,7 @@ function selectCell(cell) {
     
     cell.classList.add("selected");
     selectedCells.push(cell);
+    drawLinesBetweenCells();
 }
 
 // Reset current selection of cells/letters
@@ -86,6 +87,8 @@ function resetSelection() {
     selectedCells.forEach(cell => cell.classList.remove("selected"));
     selectedCells = [];
     selectedWord = "";
+    const svg = document.getElementById("line-layer");
+    svg.innerHTML = "";
 }
 
 // Update the text in the top banner
@@ -103,6 +106,38 @@ function handleGuess() {
         updateBannerText("Incorrect");
     }
     resetSelection();
+}
+
+function drawLinesBetweenCells() {
+    // Get line layer as JS element
+    const svg = document.getElementById("line-layer");
+    // Clear old lines
+    svg.innerHTML = "";
+    
+    const svgRect = svg.getBoundingClientRect();
+    
+    for (let i = 0; i < selectedCells.length - 1; i++) {
+        // Get cooridnates of origin and destination cells
+        const origin = selectedCells[i].getBoundingClientRect();
+        const dest = selectedCells[i+1].getBoundingClientRect();
+        
+        // Calculate centers
+        const x1 = origin.left + origin.width / 2 - svgRect.left;
+        const y1 = origin.top + origin.height / 2 - svgRect.top;
+        const x2 = dest.left + dest.width / 2 - svgRect.left;
+        const y2 = dest.top + dest.height / 2 - svgRect.top;
+        
+        // SVG namespace
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        // Translate to SVG layer coordinates
+        line.setAttribute("x1", x1 - svgRect.left);
+        line.setAttribute("x2", x2 - svgRect.left);
+        line.setAttribute("y1", y1 - svgRect.top);
+        line.setAttribute("y2", y2 - svgRect.top);
+        
+        // Add to SVG layer
+        svg.appendChild(line);
+    }
 }
 
 /*************
@@ -156,7 +191,7 @@ grid.addEventListener("pointerup", () => {
     
     // Indicate that the user is no longer holding down
     hasDragged = false;
-})
+});
 
 grid.addEventListener("click", (e) => {
     //Ignore clicks outside of the grid
@@ -173,4 +208,4 @@ grid.addEventListener("click", (e) => {
     } else {
         selectCell(e.target);
     }
-})
+});
