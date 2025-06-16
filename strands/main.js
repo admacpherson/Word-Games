@@ -84,12 +84,14 @@ function selectCell(cell) {
 
 // Reset current selection of cells/letters
 function resetSelection() {
+    // De-select all incorrect cells
     selectedCells.forEach( cell => {
         if (!cell.classList.contains("confirmed")) {
             cell.classList.remove("selected");
         }
     });
     
+    // Remove lines between all incorrect cells
     const svg = document.getElementById("line-layer");
     Array.from(svg.children).forEach(line => {
         if (!line.classList.contains("confirmed-line")) {
@@ -116,7 +118,6 @@ function handleGuess() {
         
         // Mark correct word cells permanently
         selectedCells.forEach(cell => {
-            confirmedCells.add(cell);
             cell.classList.add("confirmed");
             drawLinesBetweenCells(selectedCells, true)
         })
@@ -134,8 +135,8 @@ function drawLinesBetweenCells(cells, permanent = false) {
     
     for (let i = 0; i < cells.length - 1; i++) {
         // Get cooridnates of origin and destination cells
-        const origin = selectedCells[i].getBoundingClientRect();
-        const dest = selectedCells[i+1].getBoundingClientRect();
+        const origin = cells[i].getBoundingClientRect();
+        const dest = cells[i+1].getBoundingClientRect();
         
         // Calculate centers
         const x1 = origin.left + origin.width / 2 - svgRect.left;
