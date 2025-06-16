@@ -79,16 +79,26 @@ function selectCell(cell) {
     
     cell.classList.add("selected");
     selectedCells.push(cell);
-    drawLinesBetweenCells();
+    drawLinesBetweenCells(selectedCells);
 }
 
 // Reset current selection of cells/letters
 function resetSelection() {
-    selectedCells.forEach(cell => cell.classList.remove("selected"));
+    selectedCells.forEach( cell => {
+        if (!cell.classList.contains("confirmed")) {
+            cell.classList.remove("selected");
+        }
+    });
+    
+    const svg = document.getElementById("line-layer");
+    Array.from(svg.children).forEach(line => {
+        if (!line.classList.contains("confirmed-line")) {
+            svg.removeChild(line);
+        }
+    });
+    
     selectedCells = [];
     selectedWord = "";
-    const svg = document.getElementById("line-layer");
-    svg.innerHTML = "";
 }
 
 // Update the text in the top banner
@@ -101,22 +111,28 @@ function handleGuess() {
     selectedWord = selectedCells.map(cell => cell.textContent).join('');
     //Check if correct
     if (validWords.includes(selectedWord)) {
+        // Display banner text
         updateBannerText("Correct");
+        
+        // Mark correct word cells permanently
+        selectedCells.forEach(cell => {
+            confirmedCells.add(cell);
+            cell.classList.add("confirmed");
+            drawLinesBetweenCells(selectedCells, true)
+        })
     } else {
+        // Display banner text
         updateBannerText("Incorrect");
     }
     resetSelection();
 }
 
-function drawLinesBetweenCells() {
-    // Get line layer as JS element
+function drawLinesBetweenCells(cells, permanent = false) {
+    // Get line layer and coordinates as JS element
     const svg = document.getElementById("line-layer");
-    // Clear old lines
-    svg.innerHTML = "";
-    
     const svgRect = svg.getBoundingClientRect();
     
-    for (let i = 0; i < selectedCells.length - 1; i++) {
+    for (let i = 0; i < cells.length - 1; i++) {
         // Get cooridnates of origin and destination cells
         const origin = selectedCells[i].getBoundingClientRect();
         const dest = selectedCells[i+1].getBoundingClientRect();
@@ -134,6 +150,10 @@ function drawLinesBetweenCells() {
         line.setAttribute("x2", x2 - svgRect.left);
         line.setAttribute("y1", y1 - svgRect.top);
         line.setAttribute("y2", y2 - svgRect.top);
+        
+        if (permanent) {
+            line.classList.add("confirmed-line");
+        }
         
         // Add to SVG layer
         svg.appendChild(line);
