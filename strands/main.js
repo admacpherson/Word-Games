@@ -123,9 +123,6 @@ grid.addEventListener("pointerdown", (e) => {
     // Keep track of dragging
     dragStartX = e.clientX;
     dragStartY = e.clientY;
-    
-    // Select cell
-    selectCell(e.target);
 });
 
 // Pointer movement event listener
@@ -141,7 +138,7 @@ grid.addEventListener("pointermove", (e) => {
     // Only register drag after threshold to prevent small movements
     if (distance < dragThreshold) return;
     
-    if(!selectedCells.includes(e.target) && isDragging) {
+    if(!selectedCells.includes(e.target) && distance >= dragThreshold) {
         //Select the cell the user moves over
         selectCell(e.target);
         // Note the user has been dragging
