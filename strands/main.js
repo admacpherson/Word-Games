@@ -70,11 +70,34 @@ function getCellByIndex(i) {
     return grid.querySelector(`".cell[data-row="${row}"][data-col="${col}"]"`);
 }
 
+function isAdjacent(cell1, cell2) {
+    // Get row/col coordinates
+    const row1 = cell1.dataset.row;
+    const col1 = cell1.dataset.col;
+    const row2 = cell2.dataset.row;
+    const col2 = cell2.dataset.col;
+    
+    // Get distance in rows and columns
+    const rowDiff = Math.abs(row1 - row2);
+    const colDiff = Math.abs(col1 - col2);
+    
+    const isAdjacent = (rowDiff <= 1 && colDiff <= 1) && !(rowDiff === 0 && colDiff === 0);
+    
+    return isAdjacent;
+}
+
 // Mark a cell/letter as selected
 function selectCell(cell) {
     //Ensure it is not already selected
     if (selectedCells.includes(cell)) {
         return
+    }
+    
+    // Only check adjacency if not the first selection
+    if (selectedCells.length > 0) {
+        const lastCell = selectedCells[selectedCells.length - 1];
+        // Ignore non-adjacent selections
+        if (!isAdjacent(lastCell, cell)) return;
     }
     
     cell.classList.add("selected");
@@ -99,6 +122,7 @@ function resetSelection() {
         }
     });
     
+    // Reset selection variables
     selectedCells = [];
     selectedWord = "";
 }
