@@ -51,14 +51,17 @@ body {
     margin-top: 5vh;
     margin-left: auto;
     margin-right: auto;
-    height: 75vw;
+    height: 65vw;
     font-size: 1.5em;
 }
 
 .cell {
-    border-radius: 100%;
-    padding-left: auto;
-    padding-right: auto;
+    aspect-ratio: 1 / 1;
+    width: 9vw;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    display: flex;
 }
 
 .selected {
