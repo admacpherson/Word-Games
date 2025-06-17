@@ -19,6 +19,7 @@ const validWords = [
   "OLIVE",     // 5
 ];
 
+const prompt = "Fruity";
 
 // Grid div element
 const gridHTML = document.getElementById("grid");
@@ -39,6 +40,13 @@ let selectedWord = "";
 **CREATE GRID**
 ***************/
 
+// Create an empty row x cols 2D array
+function createEmptyGrid(rows, cols) {
+    return Array.from({ length: rows }, () => 
+        Array.from({ length: cols}, () => null)
+    );
+}
+
 // Create a div element with class "cell" and an index
 function createCell(letter, row, col) {
     const cell = document.createElement("div");
@@ -47,26 +55,6 @@ function createCell(letter, row, col) {
     cell.dataset.row = row;
     cell.dataset.col = col;
     return cell
-}
-
-// Create a cell on the DOM for each letter in the grid
-function createGrid(grid) {
-    // Iterate through each cell
-    for (let row = 0; row < numRows; row++) {
-        for (let col = 0; col < numCols; col++) {
-            // Get the letter at the specified position
-            const letter = grid[row][col];
-            // Append to the DOM
-            gridHTML.appendChild(createCell(letter, row, col));
-        }
-    }
-}
-
-// Create an empty row x cols 2D array
-function createEmptyGrid(rows, cols) {
-    return Array.from({ length: rows }, () => 
-        Array.from({ length: cols}, () => null)
-    );
 }
 
 // Shuffle letters in-place using Fisher-Yates algorithm
@@ -178,9 +166,10 @@ function placeAllWords(grid, words) {
     return true;
 }
 
-// Generate a valid grid by trying placeAllWords until succesful or max attempts
+// Generate a valid grid using algorithm
 function generateValidGrid(maxAttempts = 1000) {
     for (let i = 0; i < maxAttempts; i++) {
+        // Create a grid
         const grid = createEmptyGrid(numRows, numCols);
         if(placeAllWords(grid, validWords)) {
             console.log(`Succesfully placed all words in ${i} attempts`);
@@ -190,21 +179,30 @@ function generateValidGrid(maxAttempts = 1000) {
     throw new Error(`Failed to place all words after ${maxAttempts} attempts`);
 }
 
+// Create a cell on the DOM for each letter in the grid
+function createGrid(grid) {
+    // Iterate through each cell
+    for (let row = 0; row < numRows; row++) {
+        for (let col = 0; col < numCols; col++) {
+            // Get the letter at the specified position
+            const letter = grid[row][col];
+            // Append to the DOM
+            gridHTML.appendChild(createCell(letter, row, col));
+        }
+    }
+    const todaysPrompt = document.getElementById("prompt");
+    todaysPrompt.innerText = prompt;
+}
 
+// Setup game board
 const grid = generateValidGrid();
-
 createGrid(grid);
 resetSelection();
-updateBannerText("Test");
+updateBannerText("\n");
 
 /*******************
 **HELPER FUNCTIONS**
 ********************/
-
-// Helper function to get index
-function getCellByIndex(i) {
-    return grid.querySelector(`".cell[data-row="${row}"][data-col="${col}"]"`);
-}
 
 // Helper function to check if cells are adjacent
 function isAdjacent(cell1, cell2) {
@@ -381,6 +379,7 @@ gridHTML.addEventListener("pointerup", () => {
     hasDragged = false;
 });
 
+// Click event listener
 gridHTML.addEventListener("click", (e) => {
     //Ignore clicks outside of the grid
    if (!e.target.classList.contains("cell")) {
