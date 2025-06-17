@@ -90,6 +90,30 @@ function shuffle(array) {
     }
 }
 
+// Get the neighbors of a given cell and return a shuffled list
+function getNeighbors(row, col, grid) {
+    // Initialize blank array
+    const neighbors = [];
+    // Check all 8 directions around the cell using delta row/col
+    for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1l dc++) {
+            // Skip the actual cell
+            if (dr === 0 && dc === 0) continue;
+            //Next position to move onto
+            const newRow = row + dr;
+            const newCol = col + dc;
+            // Push to neighbors if a valid cell is null
+            if(
+                newRow >= 0 && newRow < grid.length &&
+                newCol >= 0 && newCol < grid[0].length &&
+                grid[newRow][newCol] === null
+            )
+                neighbors.push([newRow, newCol])
+        }
+    }
+    return neighbors
+}
+
 createGrid();
 resetSelection();
 updateBannerText("Test");
