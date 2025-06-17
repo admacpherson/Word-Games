@@ -6,32 +6,18 @@
 const numRows = 8;
 const numCols = 6;
 
-// Example 8x6 letter grid - scrambled letters including words: APPLE, GRAPE, PEAR, MANGO
-const letters = [
-    'A','P','P','L','E','X',
-    'X','G','R','A','P','E',
-    'X','X','P','E','A','R',
-    'M','A','N','G','O','X',
-    'X','X','X','X','X','X',
-    'X','X','X','X','X','X',
-    'X','X','X','X','X','X',
-    'X','X','X','X','X','X',
-];
-
 // Valid words in this puzzle
-//const validWords = ['APPLE', 'GRAPE', 'PEAR', 'MANGO'];
 const validWords = [
   "APPLE",     // 5
   "GRAPE",     // 5
   "PEAR",      // 4
   "MANGO",     // 5
   "PLUM",      // 4
-  "BERRY",     // 5
+  "STRAWBERRY",// 10
   "GUAVA",     // 5
   "LEMON",     // 5
   "OLIVE",     // 5
-  "FIGS"       // 4
-]; // Total = 48 letters
+];
 
 
 // Grid div element
@@ -63,12 +49,14 @@ function createCell(letter, row, col) {
     return cell
 }
 
-// Create a cell for each letter
+// Create a cell on the DOM for each letter in the grid
 function createGrid(grid) {
+    // Iterate through each cell
     for (let row = 0; row < numRows; row++) {
         for (let col = 0; col < numCols; col++) {
-            //const letterIndex = row * numCols + col;
+            // Get the letter at the specified position
             const letter = grid[row][col];
+            // Append to the DOM
             gridHTML.appendChild(createCell(letter, row, col));
         }
     }
@@ -145,6 +133,7 @@ function dfsPlaceWord(grid, word, row, col, index, path) {
     return false;
 }
 
+// Place ain individual word using DFS recursively
 function placeWord(grid, word) {
     //Create a 2D positions array
     const positions = [];
@@ -153,6 +142,7 @@ function placeWord(grid, word) {
             positions.push([r, c]);
         }
     }
+    
     // Shuffle positions
     shuffle(positions);
     
@@ -175,6 +165,7 @@ function placeWord(grid, word) {
     return false;
 }
 
+// Attempt to place all words once
 function placeAllWords(grid, words) {
     // Iterate through words
     for (const word of words) {
@@ -185,23 +176,6 @@ function placeAllWords(grid, words) {
     }
     // Return true once words are all placed
     return true;
-}
-
-// Update the DOM to reflect the backend
-function updateDisplayedGrid(grid) {
-    // Iterate through each cell
-    for (let r = 0; r < numRows; r++) {
-        for (let c= 0; c < numCols; c++) {
-            // Get letter and cell element for each spot on the grid
-            const letter = grid[r][c];
-            const cell = gridHTML.querySelector(`.cell[data-row = "${r}"][data-col="${c}]"`);
-            // If the cell is empty, place an X, otherwise place the letter
-            if (cell) {
-                cell.textContent = (letter === null ? 'X' : letter);
-            }
-        }
-    }
-    console.log("Letters placed");
 }
 
 // Generate a valid grid by trying placeAllWords until succesful or max attempts
@@ -217,10 +191,7 @@ function generateValidGrid(maxAttempts = 1000) {
 }
 
 
-
-
 const grid = generateValidGrid();
-updateDisplayedGrid(grid);
 
 createGrid(grid);
 resetSelection();
