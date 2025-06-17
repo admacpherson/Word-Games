@@ -64,11 +64,11 @@ function createCell(letter, row, col) {
 }
 
 // Create a cell for each letter
-function createGrid() {
+function createGrid(grid) {
     for (let row = 0; row < numRows; row++) {
         for (let col = 0; col < numCols; col++) {
-            const letterIndex = row * numCols + col;
-            const letter = letters[letterIndex];
+            //const letterIndex = row * numCols + col;
+            const letter = grid[row][col];
             gridHTML.appendChild(createCell(letter, row, col));
         }
     }
@@ -178,20 +178,53 @@ function placeWord(grid, word) {
 function placeAllWords(grid, words) {
     // Iterate through words
     for (const word of words) {
+        // Return false if a word can't be placed
         if (!placeWord(grid, word)) {
-            console.error(`Could not place word: ${word}`);
             return false;
         }
     }
+    // Return true once words are all placed
     return true;
 }
 
-createGrid();
+// Update the DOM to reflect the backend
+function updateDisplayedGrid(grid) {
+    // Iterate through each cell
+    for (let r = 0; r < numRows; r++) {
+        for (let c= 0; c < numCols; c++) {
+            // Get letter and cell element for each spot on the grid
+            const letter = grid[r][c];
+            const cell = gridHTML.querySelector(`.cell[data-row = "${r}"][data-col="${c}]"`);
+            // If the cell is empty, place an X, otherwise place the letter
+            if (cell) {
+                cell.textContent = (letter === null ? 'X' : letter);
+            }
+        }
+    }
+    console.log("Letters placed");
+}
+
+// Generate a valid grid by trying placeAllWords until succesful or max attempts
+function generateValidGrid(maxAttempts = 1000) {
+    for (let i = 0; i < maxAttempts; i++) {
+        const grid = createEmptyGrid(numRows, numCols);
+        if(placeAllWords(grid, validWords)) {
+            console.log(`Succesfully placed all words in ${i} attempts`);
+            return grid;
+        } 
+    }
+    throw new Error(`Failed to place all words after ${maxAttempts} attempts`);
+}
+
+
+
+
+const grid = generateValidGrid();
+updateDisplayedGrid(grid);
+
+createGrid(grid);
 resetSelection();
 updateBannerText("Test");
-const grid = createEmptyGrid(numRows, numCols);
-placeAllWords(grid, validWords);
-
 
 /*******************
 **HELPER FUNCTIONS**
