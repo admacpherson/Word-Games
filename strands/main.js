@@ -90,7 +90,7 @@ function shuffle(array) {
     }
 }
 
-// Get the neighbors of a given cell and return a shuffled list
+// Get the neighbors of a given cell
 function getNeighbors(row, col, grid) {
     // Initialize blank array
     const neighbors = [];
@@ -113,6 +113,35 @@ function getNeighbors(row, col, grid) {
     }
     return neighbors
 }
+
+// Use DFS search with backtracking at the word level
+function dfsPlaceWord(grid, word, row, col, index, path) {
+    // Stop once word is placed
+    if (index === word.length) return true;
+    
+    // Get available neighbors
+    const neighbors = getNeighbors(row, col, grid);
+    
+    // Iterate through each neighbor
+    for (const [r, c] of neighbors) {
+        // Check if neighboring cell is empty
+        if (grid[r][c] === null) {
+            // Fill in the next letter and store the path
+            grid[r][c] = word[index];
+            path.push([r, c]);
+            
+            //Recursively try to place the rest of the word
+            if (dfsPlaceWord(grid, row, r, c, index + 1, path)) return true;
+            
+            //Backtrack if recursive call fails by undoing placement and removing path
+            grid[r][c] = null;
+            path.pop();
+        }
+    }
+    // Return false is unable to place word
+    return false;
+}
+
 
 createGrid();
 resetSelection();
