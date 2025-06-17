@@ -19,7 +19,20 @@ const letters = [
 ];
 
 // Valid words in this puzzle
-const validWords = ['APPLE', 'GRAPE', 'PEAR', 'MANGO'];
+//const validWords = ['APPLE', 'GRAPE', 'PEAR', 'MANGO'];
+const validWords = [
+  "APPLE",     // 5
+  "GRAPE",     // 5
+  "PEAR",      // 4
+  "MANGO",     // 5
+  "PLUM",      // 4
+  "BERRY",     // 5
+  "GUAVA",     // 5
+  "LEMON",     // 5
+  "OLIVE",     // 5
+  "FIGS"       // 4
+]; // Total = 48 letters
+
 
 // Grid div element
 const grid = document.getElementById("grid");
@@ -58,6 +71,22 @@ function createGrid() {
             const letter = letters[letterIndex];
             grid.appendChild(createCell(letter, row, col));
         }
+    }
+}
+
+// Create an empty row x cols 2D array
+function createEmptyGrid(rows, cols) {
+    return Array.from({ length: rows }, () => Array.from({ length: cols} ), () => null);
+}
+
+// Shuffle letters in-place using Fisher-Yates algorithm
+function shuffle(array) {
+    // Start at the end of the array and work backwards
+    for (let i = array.length -1; i > 0; i--) {
+        // Get a random position (j) between 0 and i (inclusive)
+        const j = Math.floor(Math.random() * (i + 1));
+        // Swap the element at i with the element at j
+        [array[i], array[j]] = [array[j], array[i]];
     }
 }
 
