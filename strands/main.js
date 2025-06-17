@@ -35,7 +35,7 @@ const validWords = [
 
 
 // Grid div element
-const grid = document.getElementById("grid");
+const gridHTML = document.getElementById("grid");
 
 // Keep track of whether user is dragging/swiping
 let isDragging = false;
@@ -69,14 +69,16 @@ function createGrid() {
         for (let col = 0; col < numCols; col++) {
             const letterIndex = row * numCols + col;
             const letter = letters[letterIndex];
-            grid.appendChild(createCell(letter, row, col));
+            gridHTML.appendChild(createCell(letter, row, col));
         }
     }
 }
 
 // Create an empty row x cols 2D array
 function createEmptyGrid(rows, cols) {
-    return Array.from({ length: rows }, () => Array.from({ length: cols} ), () => null);
+    return Array.from({ length: rows }, () => 
+        Array.from({ length: cols}, () => null)
+    );
 }
 
 // Shuffle letters in-place using Fisher-Yates algorithm
@@ -96,7 +98,7 @@ function getNeighbors(row, col, grid) {
     const neighbors = [];
     // Check all 8 directions around the cell using delta row/col
     for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1l dc++) {
+        for (let dc = -1; dc <= 1; dc++) {
             // Skip the actual cell
             if (dr === 0 && dc === 0) continue;
             //Next position to move onto
@@ -107,8 +109,9 @@ function getNeighbors(row, col, grid) {
                 newRow >= 0 && newRow < grid.length &&
                 newCol >= 0 && newCol < grid[0].length &&
                 grid[newRow][newCol] === null
-            )
-                neighbors.push([newRow, newCol])
+            ) {
+                neighbors.push([newRow, newCol]);
+            }
         }
     }
     return neighbors
@@ -131,7 +134,7 @@ function dfsPlaceWord(grid, word, row, col, index, path) {
             path.push([r, c]);
             
             //Recursively try to place the rest of the word
-            if (dfsPlaceWord(grid, row, r, c, index + 1, path)) return true;
+            if (dfsPlaceWord(grid, word, r, c, index + 1, path)) return true;
             
             //Backtrack if recursive call fails by undoing placement and removing path
             grid[r][c] = null;
@@ -168,11 +171,27 @@ function placeWord(grid, word) {
             grid[r][c] = null;
         }
     }
+    // Return false if unable to place word
+    return false;
+}
+
+function placeAllWords(grid, words) {
+    // Iterate through words
+    for (const word of words) {
+        if (!placeWord(grid, word)) {
+            console.error(`Could not place word: ${word}`);
+            return false;
+        }
+    }
+    return true;
 }
 
 createGrid();
 resetSelection();
 updateBannerText("Test");
+const grid = createEmptyGrid(numRows, numCols);
+placeAllWords(grid, validWords);
+
 
 /*******************
 **HELPER FUNCTIONS**
@@ -310,7 +329,7 @@ function drawLinesBetweenCells(cells, permanent = false) {
 ******************/
 
 // Pointer down event listener
-grid.addEventListener("pointerdown", (e) => {
+gridHTML.addEventListener("pointerdown", (e) => {
     //Ignore clicks outside of the grid
    if (!e.target.classList.contains("cell")) {
        return;
@@ -326,7 +345,7 @@ grid.addEventListener("pointerdown", (e) => {
 });
 
 // Pointer movement event listener
-grid.addEventListener("pointermove", (e) => {
+gridHTML.addEventListener("pointermove", (e) => {
     // Ignore if the user isn't holding down or on the grid
     if (!isDragging || !e.target.classList.contains("cell")) return;
     
@@ -347,7 +366,7 @@ grid.addEventListener("pointermove", (e) => {
 });
 
 // Pointer up event listener
-grid.addEventListener("pointerup", () => {
+gridHTML.addEventListener("pointerup", () => {
     isDragging = false;
     // Only finalize guess if they are done dragging (ignore clicks)
     if (hasDragged) {
@@ -358,7 +377,7 @@ grid.addEventListener("pointerup", () => {
     hasDragged = false;
 });
 
-grid.addEventListener("click", (e) => {
+gridHTML.addEventListener("click", (e) => {
     //Ignore clicks outside of the grid
    if (!e.target.classList.contains("cell")) {
        return;
