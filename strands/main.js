@@ -142,6 +142,33 @@ function dfsPlaceWord(grid, word, row, col, index, path) {
     return false;
 }
 
+function placeWord(grid, word) {
+    //Create a 2D positions array
+    const positions = [];
+    for (let r = 0; r < grid.length; r++) {
+        for (let c = 0; c < grid[0].length; c++) {
+            positions.push([r, c]);
+        }
+    }
+    // Shuffle positions
+    shuffle(positions);
+    
+    // Iterate through shuffled positions
+    for (const [r, c] of positions) {
+        // If a cell is available, start placing the word
+        if(grid[r][c] === null) {
+            // Place the first letter
+            grid[r][c] = word[0];
+            // Store the first cell in the path
+            const path = [[r, c]];
+            // Recusrively place the rest of the cells
+            if (dfsPlaceWord(grid, word, r, c, 1, path)) return true;
+            
+            // If unable to place word, undo placement and move on
+            grid[r][c] = null;
+        }
+    }
+}
 
 createGrid();
 resetSelection();
