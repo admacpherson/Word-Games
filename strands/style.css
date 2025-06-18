@@ -66,8 +66,16 @@ body {
     z-index: 2;
 }
 
-.selected, .confirmed {
+.selected {
+    background-color: moccasin;
+}
+
+.confirmed {
     background-color: lightblue;
+}
+
+.spangram {
+    background-color: gold;
 }
 
 #line-layer {
@@ -80,7 +88,17 @@ body {
     z-index: 1;
 }
 
-#line-layer line, .confirmed-line {
+#line-layer line:not(.confirmed-line):not(.spangram-line) {
+    stroke: moccasin; 
+    stroke-width: 15;
+}
+
+#line-layer line.confirmed-line {
     stroke: lightblue; 
+    stroke-width: 15;
+}
+
+#line-layer line.spangram-line {
+    stroke: gold;
     stroke-width: 15;
 }

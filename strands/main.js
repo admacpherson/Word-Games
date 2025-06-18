@@ -6,6 +6,7 @@
 const numRows = 8;
 const numCols = 6;
 
+const spanGram = "FRUITS"; //6
 // Valid words in this puzzle
 const validWords = [
   "APPLE",     // 5
@@ -14,9 +15,9 @@ const validWords = [
   "MANGO",     // 5
   "PLUM",      // 4
   "STRAWBERRY",// 10
-  "GUAVA",     // 5
   "LEMON",     // 5
-  "OLIVE",     // 5
+  "LIME",      // 4
+  "FRUITS"
 ];
 
 const prompt = "Fruity";
@@ -86,6 +87,21 @@ function getVirtualCellCenter(row, col) {
     const x = col + 0.5;
     const y = row + 0.5;
     return { x, y };
+}
+
+// Ensure spangram spans the board
+function spansAcrossBoard(path) {
+    //Define rows and columns
+    const rows = path.map(p => p[0]);
+    const cols = path.map(p => p[1]);
+    
+    // Check which bounadries are included
+    const touchesTop = rows.includes(0);
+    const touchesBottom = rows.includes(numRows - 1);
+    const touchesLeft = cols.includes(0);
+    const touchesRight = cols.includes(numCols - 1)
+    
+    return ((touchesTop && touchesBottom) || (touchesLeft && touchesRight));
 }
 
 /**************
@@ -203,8 +219,8 @@ function dfsPlaceWord(grid, word, row, col, index, path) {
     return false;
 }
 
-// Place ain individual word using DFS recursively
-function placeWord(grid, word) {
+// Place an individual word using DFS recursively
+function placeWord(grid, word, mustSpan = false) {
     //Create a 2D positions array
     const positions = [];
     for (let r = 0; r < grid.length; r++) {
@@ -226,6 +242,13 @@ function placeWord(grid, word) {
             const path = [[r, c]];
             // Recusrively place the rest of the cells
             if (dfsPlaceWord(grid, word, r, c, 1, path)) {
+                // Ensure spangram actually spans and undo if not
+                if (mustSpan && !spansAcrossBoard(path)) {
+                    // Clear cells that were just placed
+                    path.forEach(([r, c]) => grid[r][c] = null);
+                    placedSegments.splice(placedSegments.length - (word.length - 1));
+                    continue;
+                }
                 // Save path and return true
                 wordPaths[word] = path.slice();
                 return true;
@@ -244,7 +267,7 @@ function placeAllWords(grid, words) {
     // Iterate through words
     for (const word of words) {
         // Return false if a word can't be placed
-        if (!placeWord(grid, word)) {
+        if (!placeWord(grid, word, word === spanGram)) {
             return false;
         }
     }
@@ -260,8 +283,17 @@ function generateValidGrid(maxAttempts = 1000) {
         
         // Create a grid
         const grid = createEmptyGrid(numRows, numCols);
+        
         // Place in length order to reduce conflicts
-        const validWordsSorted = [...validWords].sort((a,b) => b.length - a.length);
+        const blueWordsSorted = [...validWords].sort((a,b) => b.length - a.length);
+        
+        // Add spangram and move to front to ensure first placement
+        const validWordsSorted = [
+            ...blueWordsSorted.filter(word => word === spanGram),
+            ...blueWordsSorted.filter(word => word !== spanGram)
+        ]
+        
+        // Attempt to place words using placeAllWords
         if(placeAllWords(grid, validWordsSorted)) {
             console.log(`Succesfully placed all words in ${i} attempts`);
             return grid;
@@ -382,14 +414,19 @@ function handleGuess() {
     selectedWord = selectedCells.map(cell => cell.textContent).join('');
     //Check if guess is valid and correct
     if (validWords.includes(selectedWord) && isSelectionValid(selectedCells)) {
+        const isSpanGram = selectedWord === spanGram;
         // Display banner text
         updateBannerText("Correct");
         
         // Mark correct word cells permanently
         selectedCells.forEach(cell => {
             cell.classList.add("confirmed");
-            drawLinesBetweenCells(selectedCells, true)
+            if (isSpanGram) {
+                cell.classList.add("spangram");
+            }
         })
+        drawLinesBetweenCells(selectedCells, true, isSpanGram);
+        
     } else {
         // Display banner text
         updateBannerText("Incorrect");
@@ -398,7 +435,7 @@ function handleGuess() {
 }
 
 // Draw lines between cells
-function drawLinesBetweenCells(cells, permanent = false) {
+function drawLinesBetweenCells(cells, permanent = false, isSpangram = false) {
     // Get line layer and coordinates as JS element
     const svg = document.getElementById("line-layer");
     const svgRect = svg.getBoundingClientRect();
@@ -424,8 +461,11 @@ function drawLinesBetweenCells(cells, permanent = false) {
         
         if (permanent) {
             line.classList.add("confirmed-line");
+            if (isSpangram) {
+                line.classList.add("spangram-line");
+            }
         }
-        
+        console.log("Line classes:", line.className.baseVal);
         // Add to SVG layer
         svg.appendChild(line);
     }
