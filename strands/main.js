@@ -1,25 +1,15 @@
 /******************
 **SETUP/VARIABLES**
 *******************/
+import { gameplays } from './gameplays.js';
+
+const gamePlayNum = Math.round(Math.random() * gameplays.length);
+const currentGamePlay = gameplays[gamePlayNum];
+const { spanGram, validWords, prompt } = currentGamePlay;
 
 // Set grid size
 const numRows = 8;
 const numCols = 6;
-
-const spanGram = "FRUITS"; //6
-// Valid words in this puzzle
-const validWords = [
-  "APPLE",     // 5
-  "GRAPE",     // 5
-  "PEAR",      // 4
-  "MANGO",     // 5
-  "PLUM",      // 4
-  "STRAWBERRY",// 10
-  "LEMON",     // 5
-  "LIME",      // 4
-];
-
-const prompt = "Fruity";
 
 // Grid div element
 const gridHTML = document.getElementById("grid");
