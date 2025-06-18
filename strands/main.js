@@ -17,7 +17,6 @@ const validWords = [
   "STRAWBERRY",// 10
   "LEMON",     // 5
   "LIME",      // 4
-  "FRUITS"
 ];
 
 const prompt = "Fruity";
@@ -277,6 +276,7 @@ function placeAllWords(grid, words) {
 
 // Generate a valid grid using algorithm
 function generateValidGrid(maxAttempts = 1000) {
+    validWords.push(spanGram);
     for (let i = 0; i < maxAttempts; i++) {
         // Reset placed segments on each attempt
         placedSegments = [];
