@@ -40,6 +40,54 @@ let selectedCells = [];
 // Keep track of current word
 let selectedWord = "";
 
+/*******************
+**HELPER FUNCTIONS**
+********************/
+
+// Helper function to check if cells are adjacent
+function isAdjacent(cell1, cell2) {
+    // Get row/col coordinates
+    const row1 = cell1.dataset.row;
+    const col1 = cell1.dataset.col;
+    const row2 = cell2.dataset.row;
+    const col2 = cell2.dataset.col;
+    
+    // Get distance in rows and columns
+    const rowDiff = Math.abs(row1 - row2);
+    const colDiff = Math.abs(col1 - col2);
+    
+    const isAdjacent = (rowDiff <= 1 && colDiff <= 1) && !(rowDiff === 0 && colDiff === 0);
+    
+    return isAdjacent;
+}
+
+// Determine if three points are in a counterclockwise order
+// Compute the signed area of the triangle formed by the points
+// Positive area -> CCW
+// Negative area -> CW
+// Zero area -> No turn (colinear)
+function ccw(p1, p2, p3) {
+    return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
+}
+
+// Check if two segments AB and CD intersect
+// Check if C and D are on opposite sides of AB
+// and if A and B are on opposites sides of CD
+// If both are true, the segments intersect
+function segmentsIntersect(a, b, c, d) {
+    return (
+        ccw(a, c, d) !== ccw(b, c, d) && // C and D are on opposite sides of AB
+        ccw(a, b, c) !== ccw(a, b, d)    // A and B are on opposite sides of CD
+    );
+}
+
+// Get the coordinates for the center of the cell based on row/col positions
+function getVirtualCellCenter(row, col) {
+    const x = col + 0.5;
+    const y = row + 0.5;
+    return { x, y };
+}
+
 /**************
 **CREATE GRID**
 ***************/
@@ -104,14 +152,43 @@ function dfsPlaceWord(grid, word, row, col, index, path) {
     
     // Get available neighbors
     const neighbors = getNeighbors(row, col, grid);
+    // Get prevoiously placed cell
+    const prev = [row, col];
     
     // Iterate through each neighbor
     for (const [r, c] of neighbors) {
         // Check if neighboring cell is empty
         if (grid[r][c] === null) {
+            // Get line segment of last placed cell to current cell
+            const newSegment = [prev, [r, c]]
+            // Convert segment endpoints to (x, y) screen coords
+            const p1 = getVirtualCellCenter(...newSegment[0]);
+            const p2 = getVirtualCellCenter(...newSegment[1]);
+            // Check that cells exist
+            if (!p1 || !p2) continue;
+            
+            //Assume lines do not intersect to initialize
+            let crosses = false;
+            
+            // Iterate through placed segments to check for potential intersections
+            for (const [endpoint1, endpoint2] of placedSegments) {
+                // Convert segment endpoints to (x, y) screen coords
+                const startCoords = getVirtualCellCenter(...endpoint1);
+                const endCoords = getVirtualCellCenter(...endpoint2);
+                // Check if segments intersect
+                if (segmentsIntersect(p1, p2, startCoords, endCoords)) {
+                    crosses = true;
+                    break;
+                }
+            }
+            
+            // If segments intersect do not place
+            if (crosses) continue;
+            
             // Fill in the next letter and store the path
             grid[r][c] = word[index];
             path.push([r, c]);
+            placedSegments.push(newSegment);
             
             //Recursively try to place the rest of the word
             if (dfsPlaceWord(grid, word, r, c, index + 1, path)) return true;
@@ -119,6 +196,7 @@ function dfsPlaceWord(grid, word, row, col, index, path) {
             //Backtrack if recursive call fails by undoing placement and removing path
             grid[r][c] = null;
             path.pop();
+            placedSegments.pop();
         }
     }
     // Return false is unable to place word
@@ -177,9 +255,14 @@ function placeAllWords(grid, words) {
 // Generate a valid grid using algorithm
 function generateValidGrid(maxAttempts = 1000) {
     for (let i = 0; i < maxAttempts; i++) {
+        // Reset placed segments on each attempt
+        placedSegments = [];
+        
         // Create a grid
         const grid = createEmptyGrid(numRows, numCols);
-        if(placeAllWords(grid, validWords)) {
+        // Place in length order to reduce conflicts
+        const validWordsSorted = [...validWords].sort((a,b) => b.length - a.length);
+        if(placeAllWords(grid, validWordsSorted)) {
             console.log(`Succesfully placed all words in ${i} attempts`);
             return grid;
         } 
@@ -207,63 +290,6 @@ const grid = generateValidGrid();
 createGrid(grid);
 resetSelection();
 updateBannerText("\n");
-
-/*******************
-**HELPER FUNCTIONS**
-********************/
-
-// Helper function to check if cells are adjacent
-function isAdjacent(cell1, cell2) {
-    // Get row/col coordinates
-    const row1 = cell1.dataset.row;
-    const col1 = cell1.dataset.col;
-    const row2 = cell2.dataset.row;
-    const col2 = cell2.dataset.col;
-    
-    // Get distance in rows and columns
-    const rowDiff = Math.abs(row1 - row2);
-    const colDiff = Math.abs(col1 - col2);
-    
-    const isAdjacent = (rowDiff <= 1 && colDiff <= 1) && !(rowDiff === 0 && colDiff === 0);
-    
-    return isAdjacent;
-}
-
-// Determine if three points are in a counterclockwise order
-// Compute the signed area of the triangle formed by the points
-// Positive area -> CCW
-// Negative area -> CW
-// Zero area -> No turn (colinear)
-function ccw(p1, p2, p3) {
-    return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
-}
-
-// Check if two segments AB and CD intersect
-// Check if C and D are on opposite sides of AB
-// and if A and B are on opposites sides of CD
-// If both are true, the segments intersect
-function segmentsIntersect(a, b, c, d) {
-    return (
-        ccw(a, c, d) !== ccw(b, c, d) && // C and D are on opposite sides of AB
-        ccw(a, b, c) !== ccw(a, b, d)    // A and B are on opposite sides of CD
-    );
-}
-
-// Get the coordinates for the center of the cell
-function getCellCenter(row, col) {
-    // Get the cell at the specified row/col
-    const cell = document.querySelector(`.cell[data-row = "${row}"][data-col="${col}"]`);
-    
-    // Return null if not found
-    if (!cell) return null;
-    
-    // Get coordinates
-    const rect = cell.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-    
-    return {x, y};
-}
 
 /*********************
 **GAMEPLAY FUNCTIONS**
