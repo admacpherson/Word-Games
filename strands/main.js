@@ -25,6 +25,8 @@ const prompt = "Fruity";
 const gridHTML = document.getElementById("grid");
 // Map word -> array of [row, col] placement
 let wordPaths = {};
+// Track segments that have been placed to avoid intersections
+let placedSegments = [];
 
 // Keep track of whether user is dragging/swiping
 let isDragging = false;
@@ -225,6 +227,42 @@ function isAdjacent(cell1, cell2) {
     const isAdjacent = (rowDiff <= 1 && colDiff <= 1) && !(rowDiff === 0 && colDiff === 0);
     
     return isAdjacent;
+}
+
+// Determine if three points are in a counterclockwise order
+// Compute the signed area of the triangle formed by the points
+// Positive area -> CCW
+// Negative area -> CW
+// Zero area -> No turn (colinear)
+function ccw(p1, p2, p3) {
+    return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
+}
+
+// Check if two segments AB and CD intersect
+// Check if C and D are on opposite sides of AB
+// and if A and B are on opposites sides of CD
+// If both are true, the segments intersect
+function segmentsIntersect(a, b, c, d) {
+    return (
+        ccw(a, c, d) !== ccw(b, c, d) && // C and D are on opposite sides of AB
+        ccw(a, b, c) !== ccw(a, b, d)    // A and B are on opposite sides of CD
+    );
+}
+
+// Get the coordinates for the center of the cell
+function getCellCenter(row, col) {
+    // Get the cell at the specified row/col
+    const cell = document.querySelector(`.cell[data-row = "${row}"][data-col="${col}"]`);
+    
+    // Return null if not found
+    if (!cell) return null;
+    
+    // Get coordinates
+    const rect = cell.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    
+    return {x, y};
 }
 
 /*********************
