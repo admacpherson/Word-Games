@@ -23,6 +23,8 @@ const prompt = "Fruity";
 
 // Grid div element
 const gridHTML = document.getElementById("grid");
+// Map word -> array of [row, col] placement
+let wordPaths = {};
 
 // Keep track of whether user is dragging/swiping
 let isDragging = false;
@@ -143,7 +145,11 @@ function placeWord(grid, word) {
             // Store the first cell in the path
             const path = [[r, c]];
             // Recusrively place the rest of the cells
-            if (dfsPlaceWord(grid, word, r, c, 1, path)) return true;
+            if (dfsPlaceWord(grid, word, r, c, 1, path)) {
+                // Save path and return true
+                wordPaths[word] = path.slice();
+                return true;
+            }
             
             // If unable to place word, undo placement and move on
             grid[r][c] = null;
@@ -244,6 +250,35 @@ function selectCell(cell) {
     drawLinesBetweenCells(selectedCells);
 }
 
+// Check if the input the user has entered is the correct path for a word
+function isSelectionValid(selection) {
+    // Get coords
+    const selectedCoords = selection.map(cell => [
+        Number(cell.dataset.row),
+        Number(cell.dataset.col)
+    ]);
+    
+    // Iterate through coordinates of words
+    for (const [word, path] of Object.entries(wordPaths)) {
+        // Skip comparing words that are not the same length as the user selection
+        if (path.length !== selectedCoords.length) continue;
+        let match = true;
+        
+        // Check if each set of coords match
+        for (let i = 0; i < path.length; i++) {
+            if (path[i][0] !== selectedCoords[i][0] || path[i][1] !== selectedCoords[i][1]) {
+                match = false;
+                break;
+            }
+        }
+        
+        // Return true if all letters match
+        if (match) return true;
+    }
+    // Else return false
+    return false;
+}
+
 // Reset current selection of cells/letters
 function resetSelection() {
     // De-select all incorrect cells
@@ -268,15 +303,21 @@ function resetSelection() {
 
 // Update the text in the top banner
 function updateBannerText(message) {
+    // Display message for 2 seconds
     document.getElementById("message").innerText = message;
+    setTimeout(() => {
+        // Set back to blank
+        document.getElementById("message").innerText = "\n";
+    }, 2000)
+    
 }
 
 // Handle guesses to check for correct words
 function handleGuess() {
     //Join all selected cells into an overall word
     selectedWord = selectedCells.map(cell => cell.textContent).join('');
-    //Check if correct
-    if (validWords.includes(selectedWord)) {
+    //Check if guess is valid and correct
+    if (validWords.includes(selectedWord) && isSelectionValid(selectedCells)) {
         // Display banner text
         updateBannerText("Correct");
         
