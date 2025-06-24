@@ -365,6 +365,18 @@ function isSelectionValid(selection) {
     return false;
 }
 
+// Remove lines between all incorrect cells
+function removeLines() {
+    // Get line layer
+    const svg = document.getElementById("line-layer");
+    // Remove each one
+    Array.from(svg.children).forEach(line => {
+        if (!line.classList.contains("confirmed-line")) {
+            svg.removeChild(line);
+        }
+    });
+}
+
 // Reset current selection of cells/letters
 function resetSelection() {
     // De-select all incorrect cells
@@ -374,13 +386,7 @@ function resetSelection() {
         }
     });
     
-    // Remove lines between all incorrect cells
-    const svg = document.getElementById("line-layer");
-    Array.from(svg.children).forEach(line => {
-        if (!line.classList.contains("confirmed-line")) {
-            svg.removeChild(line);
-        }
-    });
+   removeLines();
     
     // Reset selection variables
     selectedCells = [];
@@ -444,10 +450,10 @@ function drawLinesBetweenCells(cells, permanent = false, isSpangram = false) {
         // SVG namespace
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         // Translate to SVG layer coordinates
-        line.setAttribute("x1", x1 - svgRect.left);
-        line.setAttribute("x2", x2 - svgRect.left);
-        line.setAttribute("y1", y1 - svgRect.top);
-        line.setAttribute("y2", y2 - svgRect.top);
+        line.setAttribute("x1", x1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y1", y1);
+        line.setAttribute("y2", y2);
         
         if (permanent) {
             line.classList.add("confirmed-line");
@@ -531,3 +537,10 @@ gridHTML.addEventListener("click", (e) => {
         selectCell(e.target);
     }
 });
+
+// Redraw lines when window is resized
+window.addEventListener("resize", () => {
+    removeLines();
+    drawLinesBetweenCells(selectedCells);
+    drawLinesBetweenCells(placedSegments);
+})
