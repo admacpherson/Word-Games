@@ -1,9 +1,11 @@
 body, html {
     font-family: Arial, sans-serif;
     text-align: center;
-    height: 100%;
     overflow: hidden;
     overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
 body {
@@ -45,12 +47,12 @@ body {
 }
 
 #game-wrapper {
-    width: min(90vw, 80vh * 6/8);
+    width: min(90vw, 80vh * 6/8); /*80vh * 6/8*/
     height: auto;
     aspect-ratio: 6 / 8;
     margin: 0 auto;
-    position: relative;
     display: block;
+    flex: 1 1 auto;
 }
 
 #board-wrapper {
@@ -120,6 +122,36 @@ body {
     stroke: gold;
     stroke-width: 15;
 }
+
+#footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    align-items: center;
+    box-sizing: border-box;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+#hint-button {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 15px;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+    cursor: pointer;
+}
+
+#words-found {
+    
+}
+
 
 @media (max-width: 600px) {
     body {
