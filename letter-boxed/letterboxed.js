@@ -105,12 +105,19 @@ function updateCurrentWord() {
 }
 
 // Prompt user with temporary banner
-function showBanner(bannerText) {
+function showBanner(bannerText, color = "red") {
     // Show banner
     const banner = document.getElementById('popup-banner');
     banner.innerText = bannerText;
     banner.classList.remove('hidden');
     banner.classList.add('visible');
+    
+    // Update color if necessary
+    if (color === "red") {
+        banner.style.backgroundColor = "rgba(255, 77, 77, 0.95)";
+    } else if (color === "green") {
+        banner.style.backgroundColor = "rgba(0, 230, 93, 0.95)";
+    }
     
     // Hide after 2 seconds
     setTimeout(() => {
@@ -507,6 +514,20 @@ async function handleEnter() {
     }
     // Update
     updateCurrentWord();
+    
+    //Check if game is over
+    checkWinCondition();
+}
+
+// Check if the user has won
+function checkWinCondition() {
+    // Combine all words
+    const usedLetters = new Set(wordsStored.join(''))
+    
+    //Check if all letters have been used
+    if(letterMap.every(letter => usedLetters.has(letter))) {
+        showBanner("You solved it in " + wordsStored.length + " words!", "green");
+    }
 }
 
 // Pointer listeners to track clicking/tapping/dragging
