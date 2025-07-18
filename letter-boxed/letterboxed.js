@@ -3,10 +3,14 @@
 **************/
 
 // Define game board
-let topSide = ['W', 'M', 'Y'];
-let rightSide = ['T', 'O', 'I'];
-let bottomSide = ['H', 'N', 'D'];
-let leftSide = ['S', 'L', 'R'];
+import { gameBoards } from './boards.js';
+
+const randomBoard = gameBoards[Math.floor(Math.random() * gameBoards.length)];
+
+let topSide = randomBoard.top;
+let rightSide = randomBoard.right;
+let bottomSide = randomBoard.bottom;
+let leftSide = randomBoard.left;
 const square = [topSide, rightSide, bottomSide, leftSide];
 const square_order = ["Top", "Right", "Bottom", "Left"];
 
