@@ -647,5 +647,17 @@ document.addEventListener('keydown', async (event) => {
     hidePreviewLine();
 })
 
+// Listeners for buttons (after content has loaded)
+document.addEventListener("DOMContentLoaded", () => {
+    const restartBtn = document.getElementById("restart");
+    const deleteBtn = document.getElementById("delete");
+    const enterBtn = document.getElementById("enter");
+    
+    // Set up listeners after buttons have been loaded
+    if (restartBtn) restartBtn.addEventListener("click", resetGame);
+    if (deleteBtn) deleteBtn.addEventListener("click", handleBackspace);
+    if (enterBtn) enterBtn.addEventListener("click", handleEnter);
+});
+
 // Create gameboard and start game
 resetGame();
